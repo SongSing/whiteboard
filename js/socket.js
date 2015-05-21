@@ -32,7 +32,6 @@ Socket.prototype.connect = function()
     
     this.socket.onmessage = function(e)
     {
-        console.log(e.data);
         self.onMessage(e.data);
     };
     
@@ -50,7 +49,6 @@ Socket.prototype.sendCommand = function(command, data)
 {
     var toSend = command + "|" + data;
     this.sendRaw(toSend);
-    console.log(toSend);
 };
 
 Socket.unpack = function(d)

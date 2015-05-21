@@ -20,6 +20,12 @@ function init()
         lastPos = undefined;
     });
     
+    canvas.mouseleave(function()
+    {
+        mouseDown = false;
+        lastPos = undefined;
+    });
+    
     socket.onMessage = handleMessage;
     socket.onClose = function()
     {
