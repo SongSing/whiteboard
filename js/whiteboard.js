@@ -27,7 +27,7 @@ function init()
     };
     socket.connect();
     
-    $("#clear").onclick(clearBoard);
+    $("#clear").click(clearBoard);
 }
 
 function clearBoard()
