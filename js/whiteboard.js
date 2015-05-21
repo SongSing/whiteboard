@@ -26,6 +26,13 @@ function init()
         alert("Connection to the server lost.");  
     };
     socket.connect();
+    
+    $("#clear").onclick(clearBoard);
+}
+
+function clearBoard()
+{
+    socket.sendCommand("clear", "");
 }
 
 function handleMessage(msg)
@@ -49,6 +56,11 @@ function handleMessage(msg)
         c.beginPath();
         c.arc(p.p2.x, p.p2.y, 2.5, 0, 2 * Math.PI);
         c.fill();
+    }
+    else if (data.command === "clear")
+    {
+        var c = canvas.get(0);
+        c.getContext("2d").clearRect(0, 0, c.width, c.height);   
     }
 }
 

@@ -1,4 +1,34 @@
 #canvas
 {
     border: 1px solid #aaaaaa;
+    position:absolute;
+    left:8px;
+    top:8px;
+}
+
+#clear
+{
+    position:absolute;
+    left:816px;
+}
+
+.btn
+{
+    border:1px solid #aaaaaa;
+    background-color:white;
+    border-radius:3px;
+    padding:8px 24px;
+}
+
+.btn:hover
+{
+    border-color:#3333FF;
+    color:#3333FF;
+}
+
+.btn:active
+{
+    background:#eeeeee;
+    border-color:#1111FF;
+    color:#1111FF;
 }
