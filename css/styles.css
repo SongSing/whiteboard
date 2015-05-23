@@ -5,6 +5,20 @@
     left:8px;
     top:8px;
     cursor:default;
+    border-radius:3px;
+}
+
+#snapshots
+{
+    border:1px solid #aaaaaa;
+    position:absolute;
+    top:8px;
+    bottom:8px;
+    right:8px;
+    left:950px;
+    border-radius:3px;
+    overflow-y:scroll;
+    overflow-x:hidden;
 }
 
 #clear

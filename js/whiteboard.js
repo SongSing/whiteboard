@@ -38,6 +38,14 @@ function init()
     {
         window.open(canvas.get(0).toDataURL(), "_blank");
     });
+    
+    setInterval(function ()
+    {
+        if (socket.socket.readyState === 1)
+        {
+            socket.sendCommand("ping", "");
+        }
+    }, 60000);
 }
 
 function clearBoard()
