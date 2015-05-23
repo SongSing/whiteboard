@@ -2,6 +2,7 @@ var mouseDown = false;
 var lastPos = undefined;
 var socket = new Socket("98.193.176.25", "8080");
 var canvas;
+var receivedBoard = false;
 
 function init()
 {
@@ -46,6 +47,11 @@ function init()
             socket.sendCommand("ping", "");
         }
     }, 60000);
+    
+    window.onbeforeunload = function()
+    {
+        sendBoard(); 
+    };
 }
 
 function clearBoard()
@@ -80,6 +86,29 @@ function handleMessage(msg)
         var c = canvas.get(0);
         c.getContext("2d").clearRect(0, 0, c.width, c.height);   
     }
+    else if (data.command === "requestboard")
+    {
+        sendBoard();
+    }
+    else if (data.command === "board")
+    {
+        var img = new Image;
+        
+        img.onload = function()
+        {
+            var c = canvas.get(0).getContext("2d");
+            c.drawImage(this, 0, 0);
+            receivedBoard = true;
+        };
+        
+        img.src = data.data;
+    }
+}
+
+function sendBoard()
+{
+    if (receivedBoard)
+        socket.sendCommand("board", canvas.get(0).toDataURL());   
 }
 
 function mouseMoved(e)
