@@ -8,6 +8,13 @@
     border-radius:3px;
 }
 
+#usersOnline
+{
+    position: absolute;
+    left:816px;
+    top:168px;
+}
+
 #snapshots
 {
     border:1px solid #aaaaaa;

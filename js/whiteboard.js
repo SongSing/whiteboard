@@ -108,6 +108,10 @@ function handleMessage(msg)
         
         img.src = data.data;
     }
+    else if (data.command === "users")
+    {
+        $("#usersNumber").html(data.data);   
+    }
 }
 
 function sendBoard()
