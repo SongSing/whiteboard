@@ -94,11 +94,16 @@ function handleMessage(msg)
     {
         var img = new Image;
         
+        if (data.data === "")
+        {
+            receivedBoard = true;   
+        }
+        
         img.onload = function()
         {
+            receivedBoard = true;
             var c = canvas.get(0).getContext("2d");
             c.drawImage(this, 0, 0);
-            receivedBoard = true;
         };
         
         img.src = data.data;
