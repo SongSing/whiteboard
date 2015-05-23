@@ -11,20 +11,28 @@
 {
     position:absolute;
     left:816px;
+    top:8px;
 }
 
-#color
+#save
 {
     position:absolute;
     left:816px;
     top:48px;
 }
 
-#size
+#color
 {
     position:absolute;
     left:816px;
     top:88px;
+}
+
+#size
+{
+    position:absolute;
+    left:816px;
+    top:128px;
     padding-right:0px;
 }
 

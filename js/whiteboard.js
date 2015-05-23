@@ -34,6 +34,10 @@ function init()
     socket.connect();
     
     $("#clear").click(clearBoard);
+    $("#save").click(function()
+    {
+        window.open(canvas.get(0).toDataURL(), "_blank");
+    });
 }
 
 function clearBoard()
