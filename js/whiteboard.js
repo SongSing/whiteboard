@@ -49,18 +49,18 @@ function handleMessage(msg)
     {
         var p = JSON.parse(data.data);
         
-        var color = "black";
+        var color = p.color;
         var c = canvas.get(0).getContext("2d");
         c.strokeStyle = color;
         c.fillStyle = color;
-        c.lineWidth = 5;
+        c.lineWidth = p.size;
 
         c.beginPath();
         c.moveTo(p.p1.x, p.p1.y);
         c.lineTo(p.p2.x, p.p2.y);
         c.stroke();
         c.beginPath();
-        c.arc(p.p2.x, p.p2.y, 2.5, 0, 2 * Math.PI);
+        c.arc(p.p2.x, p.p2.y, p.size / 2, 0, 2 * Math.PI);
         c.fill();
     }
     else if (data.command === "clear")
@@ -83,7 +83,10 @@ function mouseMoved(e)
         return;
     }
     
-    var toSend = { "p1": lastPos, "p2": p };
+    var c = $("#color").get(0).value;
+    var n = parseInt($("#size").get(0).value);
+    
+    var toSend = { "p1": lastPos, "p2": p, "color": c, "size": n };
     lastPos = p;
     
     socket.sendCommand("draw", JSON.stringify(toSend));

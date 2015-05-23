@@ -12,12 +12,30 @@
     left:816px;
 }
 
-.btn
+#color
+{
+    position:absolute;
+    left:816px;
+    top:48px;
+}
+
+#size
+{
+    position:absolute;
+    left:816px;
+    top:88px;
+    padding-right:0px;
+}
+
+.btn, input
 {
     border:1px solid #aaaaaa;
     background-color:white;
     border-radius:3px;
-    padding:8px 24px;
+    width:128px;
+    height:32px;
+    padding:0px 8px;
+    box-sizing:border-box;
 }
 
 .btn:hover
