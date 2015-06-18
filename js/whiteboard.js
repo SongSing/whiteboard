@@ -3,6 +3,8 @@ var lastPos = undefined;
 var socket = new Socket("98.193.176.25", "8080");
 var canvas;
 var receivedBoard = false;
+var mouseCounter = -1;
+var mouseBuffer = 1; // increase to reduce strain on server
 
 function init()
 {
@@ -52,11 +54,30 @@ function init()
     {
         sendBoard(); 
     };
+    
+    $("#sendMessage").click(sendMessage);
+    
+    $("#chatMessage").keypress(function(e)
+	{
+		if (e.which === 13)
+		{
+			sendMessage();
+		}
+	});
 }
 
 function clearBoard()
 {
     socket.sendCommand("clear", "");
+}
+
+function sendMessage()
+{
+    if ($("#chatMessage").get(0).value.length > 0)
+    {    
+        socket.sendCommand("chat", $("#chatMessage").get(0).value);
+        $("#chatMessage").get(0).value = "";
+    }
 }
 
 function handleMessage(msg)
@@ -112,6 +133,30 @@ function handleMessage(msg)
     {
         $("#usersNumber").html(data.data);   
     }
+    else if (data.command === "chat")
+    {
+        var c = document.createElement("div");
+        c.className = "chatItem";
+        $(c).text(data.data);
+        c.innerHTML = "<span style='color:#666666; font-family:Courier New'>" + timestamp() + "</span>&nbsp;" + c.innerHTML;
+        $("#chatMessageContainer").append(c);
+    }
+}
+
+function timestamp()
+{
+	var time = new Date();
+	var h = time.getHours();
+	var m = time.getMinutes();
+	var s = time.getSeconds();
+	var d = time.getDate();
+	var mo = parseInt(time.getMonth() + 1);
+	var y = time.getFullYear();
+	var date = d + "-" + mo + "-" + y;
+	m = (m < 10 ? "0" + m : m);
+	s = (s < 10 ? "0" + s : s);
+	var timestamp = "(" + (h < 10 ? "0" + h : h) + ":" + m + ":" + s + ")";
+	return timestamp;
 }
 
 function sendBoard()
@@ -123,6 +168,12 @@ function sendBoard()
 function mouseMoved(e)
 {
     if (!mouseDown)
+        return;
+    
+    mouseCounter++;
+    mouseCounter %= mouseBuffer;
+    
+    if (mouseCounter !== 0)
         return;
     
     var p = pos(e, "#canvas");
