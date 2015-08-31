@@ -87,7 +87,7 @@
 #chatMessageContainer
 {
     border-bottom:1px solid #aaaaaa;
-    padding:8px;
+    padding:0px;
     position:absolute;
     top:0px;
     left:0px;
@@ -100,6 +100,12 @@
 #chatMessageContainer > .chatItem
 {
     word-wrap:break-word;
+    padding:4px;
+}
+
+.chatItem:nth-child(odd)
+{
+    background:#EEEEFF;
 }
 
 .chatItem:last-child

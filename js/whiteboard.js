@@ -140,6 +140,8 @@ function handleMessage(msg)
         $(c).text(data.data);
         c.innerHTML = "<span style='color:#666666; font-family:Courier New'>" + timestamp() + "</span>&nbsp;" + c.innerHTML;
         $("#chatMessageContainer").append(c);
+        var w = $("#chatMessageContainer").get(0);
+        w.scrollTop = w.scrollHeight;
     }
 }
 
