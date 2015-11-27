@@ -1,6 +1,6 @@
 var mouseDown = false;
 var lastPos = undefined;
-var socket = new Socket("98.193.176.25", "8080");
+var socket = new Socket("68.53.99.168", "5080");
 var canvas;
 var receivedBoard = false;
 var mouseCounter = -1;
