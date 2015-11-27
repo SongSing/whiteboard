@@ -9,6 +9,9 @@ var mouseBuffer = 1; // increase to reduce strain on server
 function init()
 {
     canvas = $("canvas");
+
+    canvas.get(0).getContext("2d").fillStyle = "white";
+    canvas.get(0).getContext("2d").fillRect(0, 0, 800, 600); 
     
     canvas.mousemove(mouseMoved);
     
@@ -105,7 +108,8 @@ function handleMessage(msg)
     else if (data.command === "clear")
     {
         var c = canvas.get(0);
-        c.getContext("2d").clearRect(0, 0, c.width, c.height);   
+        c.getContext("2d").fillStyle = "white";
+        c.getContext("2d").fillRect(0, 0, 800, 600);   
     }
     else if (data.command === "requestboard")
     {
