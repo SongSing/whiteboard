@@ -6,18 +6,18 @@ var receivedBoard = false;
 var mouseCounter = -1;
 var mouseBuffer = 1; // increase to reduce strain on server
 
-function mouseDown()
+function mouseDownFn()
 {
     mouseDown = true;
 }
 
-function mouseUp()
+function mouseUpFn()
 {
     mouseDown = false;
     lastPos = undefined;
 }
 
-function mouseLeave()
+function mouseLeaveFn()
 {
     mouseDown = false;
     lastPos = undefined;
@@ -30,32 +30,21 @@ function init()
     canvas.get(0).getContext("2d").fillStyle = "white";
     canvas.get(0).getContext("2d").fillRect(0, 0, 800, 600); 
     
-    canvas.mousemove(mouseMoved);
-    canvas.touchmove(mouseMoved);
+    canvas.on("vmousemove", mouseMoved);
     
-    canvas.mousedown(function()
+    canvas.on("vmousedown", function()
     {
-        mouseDown();
-    });
-    
-    canvas.mouseup(function()
-    {
-        mouseUp();
+        mouseDownFn();
     });
     
-    canvas.mouseleave(function()
+    canvas.on("vmouseup", function()
     {
-        mouseLeave();
+        mouseUpFn();
     });
-
-    canvas.touchstart(function()
+    
+    canvas.on("vmouseleave", function()
     {
-        mouseDown();
-    });
-
-    canvas.touchend(function()
-    {
-        mouseUp();
+        mouseLeaveFn();
     });
     
     socket.onMessage = handleMessage;
