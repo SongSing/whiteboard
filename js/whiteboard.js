@@ -65,7 +65,7 @@ function init()
         window.open(canvas.get(0).toDataURL(), "_blank");
     });
     
-    setInterval(function ()
+    setInterval(function()
     {
         if (socket.socket.readyState === 1)
         {
@@ -223,6 +223,13 @@ function pos(e, el)
 {
 	var x = e.clientX;
 	var y = e.clientY;
+
+    if (e.changedTouches)
+    {
+        x = e.changedTouches[0].clientX;
+        y = e.changedTouches[0].clientY;
+    }
+
 	var d = $(el).get(0);
 	
     x -= d.offsetLeft;
