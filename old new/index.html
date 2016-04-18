@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Whiteboard</title>
+        
+        <script src="js/jquery-2.1.4.min.js"></script>
+        <script src="js/colors/jscolor.js"></script>
+        <script src="js/socket.js"></script>
+        <script src="js/whiteboard.js"></script>
+        
+        <link rel="stylesheet" href="css/styles.css"></link>
+    </head>
+    <body>
+        <canvas width="800px" height="600px" id="canvasOver"></canvas>
+        <canvas width="800px" height="600px" id="canvas"></canvas>
+        <button id="clear" class="btn">Clear Board</button>
+        <button id="save" class="btn">Save</button>
+        <input class="color" id="color" value="000000"></input>
+        <input type="number" id="size" value="5" min="1" max="100"></input>
+        <span id="usersOnline"><span id="usersNumber">0</span> user(s) online</span>
+        <!-- <div id="snapshots"></div> -->
+        <div id="chat">
+            <div id="chatMessageContainer"></div>
+            <input type="text" id="chatMessage"></input>
+            <button id="sendMessage" class="btn">Send</button>
+        </div>
+        <!-- <div id="frameframe"><iframe src="http://songsing.github.io/randomPoke/" id="frame" frameBorder="0"></iframe></div>-->
+        <script>
+            init();
+        </script>
+    </body>
+</html>
