@@ -11,6 +11,7 @@ var skip = 1;
 var scounter = 0;
 var moved = false;
 var bgdata = "";
+var erasing = false;
 
 function el(id) {
     return document.getElementById(id);
@@ -36,6 +37,7 @@ function init() {
     socket.on("connect", connected);
     socket.on("disconnect", disconnected);
     socket.on("draw", drawBoard);
+    socket.on("erase", eraseBoard);
     socket.on("clear", clearBoard);
     socket.on("requestboard", sendBoard);
     socket.on("board", receiveBoard);
@@ -50,6 +52,7 @@ function init() {
     el("clear").onclick = sendClearBoard;
     el("sizeok").onclick = sizeOk;
     el("colorok").onclick = colorOk;
+    el("erase").onclick = toggleErase;
     el("setbg").onclick = pickBackground;
     el("clearbg").onclick = clearBackground;
     el("filepicker").onchange = backgroundPicked;
@@ -77,9 +80,9 @@ function mouseMoved(x, y, mouseDown, px, py, e) {
         scounter++;
         scounter %= skip;
 
-        if (receivedBoard && mouseDown && e.button === 0) {
+        if (receivedBoard && mouseDown && (e.button === 0 || e.changedTouches)) {
             if (/*scounter === 0*/true) {
-                socket.emit("draw", { x1: x, x2: px, y1: y, y2: py, size: size, color: color });
+                socket.emit(erasing ? "erase" : "draw", { x1: x, x2: px, y1: y, y2: py, size: size, color: color });
             } else {
                 canvas.pastPos = { x: px, y: py };
                 return false;
@@ -111,6 +114,12 @@ function disconnected() {
 
 function drawBoard(data) {
     drawcanvas.drawLine(data.x1, data.y1, data.x2, data.y2, data.color, data.size);
+}
+
+function eraseBoard(data) {
+    drawcanvas.setComposition("destination-out");
+    drawcanvas.drawLine(data.x1, data.y1, data.x2, data.y2, data.color, data.size);
+    drawcanvas.setComposition("source-over")
 }
 
 function clearBoard() {
@@ -225,7 +234,7 @@ function sizeOk() {
     el("sizePicker").style.display = "none";
     el("over").style.display = "none";
     state = "draw";
-    el("canvasArea").style.cursor = "none";
+    //el("canvasArea").style.cursor = "none";
 }
 
 function colorOk() {
@@ -234,7 +243,17 @@ function colorOk() {
     el("colorPicker").style.display = "none";
     el("over").style.display = "none";
     state = "draw";
-    el("canvasArea").style.cursor = "none";
+    //el("canvasArea").style.cursor = "none";
+}
+
+function toggleErase() {
+    if (erasing) {
+        erasing = false;
+        el("erase").className = "sidebtn";
+    } else {
+        erasing = true;
+        el("erase").className = "sidebtn toggled";
+    }
 }
 
 function sendClearBoard() {

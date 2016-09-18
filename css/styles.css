@@ -23,7 +23,7 @@ body, html {
 }
 
 #canvasArea > canvas {
-    cursor:none;
+    cursor:default;
 }
 
 #over {
@@ -79,8 +79,18 @@ body, html {
     cursor:pointer;
 }
 
+.toggled {
+    background-color:#CCCCCC;
+    color:#222222;
+    font-weight:bold;
+}
+
 .sidebtn:hover {
     background:#333333;
+}
+
+.toggled:hover {
+    background:#FFFFFF;
 }
 
 .sidebtn-bottom {
