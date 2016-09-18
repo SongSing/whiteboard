@@ -1,30 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <meta charset="UTF-8">
+
         <title>Whiteboard</title>
         
-        <script src="js/jquery-2.1.4.min.js"></script>
         <script src="js/colors/jscolor.js"></script>
-        <script src="js/socket.js"></script>
+        <script src="js/socket.io.js"></script>
+        <script src="js/canvas.js"></script>
         <script src="js/whiteboard.js"></script>
         
         <link rel="stylesheet" href="css/styles.css"></link>
     </head>
     <body>
-        <canvas width="800px" height="600px" id="canvas"></canvas>
-        <button id="clear" class="btn">Clear Board</button>
-        <button id="save" class="btn">Save</button>
-        <input class="color" id="color" value="000000"></input>
-        <input type="number" id="size" value="5" min="1" max="100"></input>
-        <span id="usersOnline"><span id="usersNumber">0</span> user(s) online</span>
+        <div id="canvasArea">
+            <canvas id="canvas"></canvas>
+            <canvas id="drawcanvas"></canvas>
+            <div id="over">
+                <div id="sizePicker" class="picker">
+                    <input id="size" type="number"></input>
+                    <button id="sizeok" class="ok">OK</button>
+                </div>
+                <div id="colorPicker" class="picker">
+                    <input class="color" id="color" value="000000"></input>
+                    <button id="colorok" class="ok">OK</button>
+                </div>
+            </div>
+        </div>
+        <div id="sidebar">
+            <a id="showchat" class="sidebtn">Toggle Chat</a>
+            <a id="save" class="sidebtn">Save Board</a>
+            <a id="pickcolor" class="sidebtn">Change Color</a>
+            <a id="picksize" class="sidebtn">Change Size</a>
+            <a id="setbg" class="sidebtn">Set Background</a>
+            <a id="clearbg" class="sidebtn">Clear Background</a>
+            <a id="clear" class="sidebtn sidebtn-bottom red">Clear Board</a>
+            <div id="users">0</div>
+
+            <input id="filepicker" type="file" accept="image/*" />
+        </div>
         <!-- <div id="snapshots"></div> -->
         <div id="chat">
             <div id="chatMessageContainer"></div>
             <input type="text" id="chatMessage"></input>
             <button id="sendMessage" class="btn">Send</button>
         </div>
-        <script>
-            init();
-        </script>
     </body>
 </html>

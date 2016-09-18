@@ -1,0 +1,162 @@
+body
+{
+    overflow:hidden;
+}
+
+#canvas
+{
+    border: 1px solid #aaaaaa;
+    position:absolute;
+    left:8px;
+    top:8px;
+    cursor:default;
+    border-radius:3px;
+}
+
+#usersOnline
+{
+    position: absolute;
+    left:816px;
+    top:168px;
+}
+
+#snapshots
+{
+    border:1px solid #aaaaaa;
+    position:absolute;
+    top:8px;
+    bottom:8px;
+    right:8px;
+    left:950px;
+    border-radius:3px;
+    overflow-y:scroll;
+    overflow-x:hidden;
+}
+
+#clear
+{
+    position:absolute;
+    left:816px;
+    top:8px;
+}
+
+#save
+{
+    position:absolute;
+    left:816px;
+    top:48px;
+}
+
+#color
+{
+    position:absolute;
+    left:816px;
+    top:88px;
+}
+
+#size
+{
+    position:absolute;
+    left:816px;
+    top:128px;
+    padding-right:0px;
+}
+
+#chat
+{
+    position:absolute;
+    right:0px;
+    top:0px;
+    left:952px;
+    bottom:0px;
+    border-left:1px solid #aaaaaa;
+    box-sizing:border-box;
+}
+
+#chatMessage
+{
+    position:absolute;
+    bottom:4px;
+    left:4px;
+    width:calc(100% - 76px);
+}
+
+#sendMessage
+{
+    position:absolute;
+    bottom:4px;
+    right:4px;
+    width:64px;
+}
+
+#chatMessageContainer
+{
+    border-bottom:1px solid #aaaaaa;
+    padding:0px;
+    position:absolute;
+    top:0px;
+    left:0px;
+    right:0px;
+    bottom:40px;
+    overflow-x:auto;
+    overflow-y:auto;
+}
+
+#chatMessageContainer > .chatItem
+{
+    word-wrap:break-word;
+    padding:4px;
+
+    -webkit-user-select: auto; /* Chrome/Safari */        
+    -moz-user-select: auto; /* Firefox */
+    -ms-user-select: auto; /* IE10+ */
+
+    /* Rules below not implemented in browsers yet */
+    -o-user-select: auto;
+    user-select: auto;
+}
+
+.chatItem:nth-child(odd)
+{
+    background:#EEEEFF;
+}
+
+.chatItem:last-child
+{
+    padding-bottom:8px;
+}
+
+.btn, input
+{
+    border:1px solid #aaaaaa;
+    background-color:white;
+    border-radius:3px;
+    width:128px;
+    height:32px;
+    padding:0px 8px;
+    box-sizing:border-box;
+}
+
+*
+{
+    -webkit-user-select: none; /* Chrome/Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+ */
+
+    /* Rules below not implemented in browsers yet */
+    -o-user-select: none;
+    user-select: none;
+}
+
+.btn:hover, input:hover, input:focus
+{
+    border-color:#3333FF;
+    color:#3333FF;
+}
+
+.btn:active
+{
+    background:#eeeeee;
+    border-color:#1111FF;
+    color:#1111FF;
+}
