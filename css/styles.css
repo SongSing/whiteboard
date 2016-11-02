@@ -79,10 +79,15 @@ body, html {
     cursor:pointer;
 }
 
-.toggled {
+.tool[toggled=true] {
     background-color:#CCCCCC;
     color:#222222;
     font-weight:bold;
+}
+
+.tool[toggled=true]:hover {
+    background-color:#BBBBBB;
+    color:#222222;
 }
 
 .sidebtn:hover {
@@ -91,6 +96,12 @@ body, html {
 
 .toggled:hover {
     background:#FFFFFF;
+}
+
+.sideheader {
+    color:white;
+    background:#111111;
+    font-weight:bold;
 }
 
 .sidebtn-bottom {

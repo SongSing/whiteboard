@@ -12,6 +12,8 @@ var scounter = 0;
 var moved = false;
 var bgdata = "";
 var erasing = false;
+var tool_pencil, tool_eraser, tool_drawRect, tool_fillRect, tool_clearRect;
+var tool;
 
 function el(id) {
     return document.getElementById(id);
@@ -20,6 +22,14 @@ function el(id) {
 function noop() {}
 
 function init() {
+    tool_pencil = new PencilTool();
+    tool_eraser = new EraserTool();
+    tool_drawRect = new DrawRectTool();
+    tool_fillRect = new FillRectTool();
+    tool_clearRect = new ClearRectTool();
+
+    setToolPencil();
+
     drawcanvas = new Canvas(el("drawcanvas"));
 
     canvas = new Canvas(el("canvas"));
@@ -38,12 +48,21 @@ function init() {
     socket.on("disconnect", disconnected);
     socket.on("draw", drawBoard);
     socket.on("erase", eraseBoard);
+    socket.on("drawrect", drawRectBoard);
+    socket.on("fillrect", fillRectBoard);
+    socket.on("clearrect", clearRectBoard);
     socket.on("clear", clearBoard);
     socket.on("requestboard", sendBoard);
     socket.on("board", receiveBoard);
     socket.on("users", displayUsers);
     socket.on("chat", receiveChat);
     socket.on("bg", receiveBackground);
+
+    el("pencil").onclick = setToolPencil;
+    el("eraser").onclick = setToolEraser;
+    el("drawrect").onclick = setToolDrawRect;
+    el("fillrect").onclick = setToolFillRect;
+    el("clearrect").onclick = setToolClearRect;
 
     el("showchat").onclick = toggleChat;
     el("save").onclick = saveBoard;
@@ -52,7 +71,6 @@ function init() {
     el("clear").onclick = sendClearBoard;
     el("sizeok").onclick = sizeOk;
     el("colorok").onclick = colorOk;
-    el("erase").onclick = toggleErase;
     el("setbg").onclick = pickBackground;
     el("clearbg").onclick = clearBackground;
     el("filepicker").onchange = backgroundPicked;
@@ -71,37 +89,24 @@ function init() {
     resized();
 }
 
-function mouseMoved(x, y, mouseDown, px, py, e) {
+function mouseMoved(x, y, m, px, py, e) {
     e.preventDefault();
     moved = true;
 
-    if (state === "draw") {
-        canvas.clearRect(px - size / 2 - 1, py - size / 2 - 1, size + 2, size + 2);
-        scounter++;
-        scounter %= skip;
+    mouseDown = m;
 
-        if (receivedBoard && mouseDown && (e.button === 0 || e.changedTouches)) {
-            if (/*scounter === 0*/true) {
-                socket.emit(erasing ? "erase" : "draw", { x1: x, x2: px, y1: y, y2: py, size: size, color: color });
-            } else {
-                canvas.pastPos = { x: px, y: py };
-                return false;
-            }
-        }
-
-        canvas.drawCircleInSquare(x - size / 2, y - size / 2, size, color, 1);
-    }
+    tool.clearCursor(x, y, px, py, e);
+    tool.mouseMove(x, y, px, py, e);
+    tool.drawCursor(x, y, px, py, e);
 }
 
 function mouseDown(x, y) {
     moved = false;
+    tool.mouseDown(x, y);
 }
 
 function mouseUp(x, y, px ,py) {
-    canvas.clearRect(px - size / 2 - 1, py - size / 2 - 1, size + 2, size + 2);
-    if (receivedBoard && !moved) {
-        socket.emit("draw", { x1: x, x2: px, y1: y, y2: py, size: size, color:color });
-    }
+    tool.mouseUp(x, y, px, py);
 }
 
 function connected() {
@@ -119,8 +124,26 @@ function drawBoard(data) {
 function eraseBoard(data) {
     drawcanvas.setComposition("destination-out");
     drawcanvas.drawLine(data.x1, data.y1, data.x2, data.y2, data.color, data.size);
-    drawcanvas.setComposition("source-over")
+    drawcanvas.setComposition("source-over");
 }
+
+function drawRectBoard(data) {
+    drawcanvas.setLineCap("square");
+    drawcanvas.setLineJoin("miter");
+    drawcanvas.drawRectPts(data.x1, data.y1, data.x2, data.y2, data.color, data.size);
+    drawcanvas.setLineCap("round");
+    drawcanvas.setLineJoin("round");
+};
+
+function fillRectBoard(data) {
+    drawcanvas.fillRectPts(data.x1, data.y1, data.x2, data.y2, data.color);
+};
+
+function clearRectBoard(data) {
+    drawcanvas.setComposition("destination-out");
+    drawcanvas.fillRectPts(data.x1, data.y1, data.x2, data.y2, data.color);
+    drawcanvas.setComposition("source-over");
+};
 
 function clearBoard() {
     drawcanvas.clear();
@@ -246,14 +269,55 @@ function colorOk() {
     //el("canvasArea").style.cursor = "none";
 }
 
-function toggleErase() {
-    if (erasing) {
-        erasing = false;
-        el("erase").className = "sidebtn";
-    } else {
-        erasing = true;
-        el("erase").className = "sidebtn toggled";
+function setToolPencil() {
+    tool = tool_pencil;
+    var t = document.getElementsByClassName("tool");
+
+    for (var i = 0; i < t.length; i++) {
+        t[i].setAttribute("toggled", false);
     }
+
+    el("pencil").setAttribute("toggled", true);
+}
+
+function setToolEraser() {
+    tool = tool_eraser;
+    var t = document.getElementsByClassName("tool");
+
+    for (var i = 0; i < t.length; i++) {
+        t[i].setAttribute("toggled", false);
+    }
+    el("eraser").setAttribute("toggled", true);
+}
+
+function setToolDrawRect() {
+    tool = tool_drawRect;
+    var t = document.getElementsByClassName("tool");
+
+    for (var i = 0; i < t.length; i++) {
+        t[i].setAttribute("toggled", false);
+    }
+    el("drawrect").setAttribute("toggled", true);
+}
+
+function setToolFillRect() {
+    tool = tool_fillRect;
+    var t = document.getElementsByClassName("tool");
+
+    for (var i = 0; i < t.length; i++) {
+        t[i].setAttribute("toggled", false);
+    }
+    el("fillrect").setAttribute("toggled", true);
+}
+
+function setToolClearRect() {
+    tool = tool_clearRect;
+    var t = document.getElementsByClassName("tool");
+
+    for (var i = 0; i < t.length; i++) {
+        t[i].setAttribute("toggled", false);
+    }
+    el("clearrect").setAttribute("toggled", true);
 }
 
 function sendClearBoard() {
@@ -276,7 +340,11 @@ function saveBoard() {
 
         })
     } else {
-        window.open(drawcanvas.toDataURL(), "_blank");
+        c.fill("white");
+        drawcanvas.getImage(function(img) {
+            c.drawImage(img, 0, 0);
+            window.open(c.toDataURL(), "_blank");
+        });
     }
 
 }

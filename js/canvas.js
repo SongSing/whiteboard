@@ -438,6 +438,30 @@ Canvas.prototype.drawRect = function(x, y, w, h, color, lineWidth) {
     this.context().strokeRect(x, y, w, h);
 };
 
+Canvas.prototype.drawRectPts = function(x1, y1, x2, y2, color, lineWidth) {
+    if (color !== undefined) {
+        this.context().strokeStyle = color;
+    }
+
+    if (lineWidth !== undefined) {
+        this.context().lineWidth = lineWidth;
+    }
+
+    if (x1 > x2) {
+        var _ = x1;
+        x1 = x2;
+        x2 = _;
+    }
+
+    if (y1 > y2) {
+        var _ = y1;
+        y1 = y2;
+        y2 = _;
+    }
+
+    this.context().strokeRect(x1, y1, x2 - x1, y2 - y1);
+};
+
 /**
  * Fills a rectangle
  * @param  {number} x       x position
@@ -453,6 +477,26 @@ Canvas.prototype.fillRect = function(x, y, w, h, color) {
     }
 
     this.context().fillRect(x, y, w, h);
+};
+
+Canvas.prototype.fillRectPts = function(x1, y1, x2, y2, color) {
+    if (color !== undefined) {
+        this.context().fillStyle = color;
+    }
+
+    if (x1 > x2) {
+        var _ = x1;
+        x1 = x2;
+        x2 = _;
+    }
+
+    if (y1 > y2) {
+        var _ = y1;
+        y1 = y2;
+        y2 = _;
+    }
+
+    this.context().fillRect(x1, y1, x2 - x1, y2 - y1);
 };
 
 /**

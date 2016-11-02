@@ -8,6 +8,7 @@
         <script src="js/colors/jscolor.js"></script>
         <script src="js/socket.io.js"></script>
         <script src="js/canvas.js"></script>
+        <script src="js/tools.js"></script>
         <script src="js/whiteboard.js"></script>
         
         <link rel="stylesheet" href="css/styles.css"></link>
@@ -28,11 +29,17 @@
             </div>
         </div>
         <div id="sidebar">
+            <div class="sideheader">Tools</div>
+            <a id="pencil" class="sidebtn tool">Pencil</a>
+            <a id="eraser" class="sidebtn tool">Eraser</a>
+            <a id="drawrect" class="sidebtn tool">Draw Rectangle</a>
+            <a id="fillrect" class="sidebtn tool">Fill Rectangle</a>
+            <a id="clearrect" class="sidebtn tool">Clear Rectangle</a>
+            <div class="sideheader">Misc</div>
             <a id="showchat" class="sidebtn">Toggle Chat</a>
             <a id="save" class="sidebtn">Save Board</a>
             <a id="pickcolor" class="sidebtn">Change Color</a>
             <a id="picksize" class="sidebtn">Change Size</a>
-            <a id="erase" class="sidebtn">Erase</a>
             <a id="setbg" class="sidebtn">Set Background</a>
             <a id="clearbg" class="sidebtn">Clear Background</a>
             <a id="clear" class="sidebtn sidebtn-bottom red">Clear Board</a>
@@ -43,7 +50,7 @@
         <!-- <div id="snapshots"></div> -->
         <div id="chat">
             <div id="chatMessageContainer"></div>
-            <input type="text" id="chatMessage"></input>
+            <input type="text" id="chatMessage" placeholder="tYPE HERE"></input>
             <button id="sendMessage" class="btn">Send</button>
         </div>
     </body>
