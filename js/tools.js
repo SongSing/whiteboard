@@ -1,5 +1,5 @@
 function PencilTool() {
-    this.size = 5;
+    size = 5;
     this.scounter = 0;
 }
 
@@ -20,21 +20,21 @@ PencilTool.prototype.mouseMove = function(x, y, px, py, e) {
 
 PencilTool.prototype.mouseUp = function(x, y, px, py) {
     if (receivedBoard && !moved) {
-        socket.emit("draw", { x1: x, x2: px, y1: y, y2: py, size: this.size, color: color });
+        socket.emit("draw", { x1: x, x2: px, y1: y, y2: py, size: size, color: color });
     }
 };
 
 PencilTool.prototype.drawCursor = function(x, y, px, py) {
-    canvas.drawCircleInSquare(x - this.size / 2, y - this.size / 2, this.size, color, 1);
+    canvas.drawCircleInSquare(x - size / 2, y - size / 2, size, color, 1);
 };
 
 PencilTool.prototype.clearCursor = function(x, y, px, py) {
-    canvas.clearRect(px - this.size / 2 - 1, py - this.size / 2 - 1, this.size + 2, this.size + 2);
+    canvas.clearRect(px - size / 2 - 1, py - size / 2 - 1, size + 2, size + 2);
 };
 
 
 function EraserTool() {
-    this.size = 5;
+    size = 5;
 };
 
 EraserTool.prototype.mouseDown = function(x, y) {
@@ -54,21 +54,21 @@ EraserTool.prototype.mouseMove = function(x, y, px, py, e) {
 
 EraserTool.prototype.mouseUp = function(x, y, px, py) {
     if (receivedBoard && !moved) {
-        socket.emit("erase", { x1: x, x2: px, y1: y, y2: py, size: this.size, color: color });
+        socket.emit("erase", { x1: x, x2: px, y1: y, y2: py, size: size, color: color });
     }
 };
 
 EraserTool.prototype.drawCursor = function(x, y, px, py) {
-    canvas.fillCircleInSquare(x - this.size / 2, y - this.size / 2, this.size, "white", 1);
-    canvas.drawCircleInSquare(x - this.size / 2, y - this.size / 2, this.size, "black", 1);
+    canvas.fillCircleInSquare(x - size / 2, y - size / 2, size, "white", 1);
+    canvas.drawCircleInSquare(x - size / 2, y - size / 2, size, "black", 1);
 };
 
 EraserTool.prototype.clearCursor = function(x, y, px, py) {
-    canvas.clearRect(px - this.size / 2 - 1, py - this.size / 2 - 1, this.size + 2, this.size + 2);
+    canvas.clearRect(px - size / 2 - 1, py - size / 2 - 1, size + 2, size + 2);
 };
 
 function DrawRectTool() {
-    this.size = 5;
+    size = 5;
     this.active = false;
     this.w = 2;
     this.s = 10;
@@ -82,13 +82,13 @@ DrawRectTool.prototype.mouseDown = function(x, y) {
 
 DrawRectTool.prototype.mouseMove = function(x, y, px, py, e) {
     if (receivedBoard && mouseDown && (e.button === 0 || e.changedTouches)) {
-        canvas.drawRectPts(x, y, this.ox, this.oy, color, this.size);
+        canvas.drawRectPts(x, y, this.ox, this.oy, color, size);
     }
 };
 
 DrawRectTool.prototype.mouseUp = function(x, y) {
     if (receivedBoard && this.active) {
-        socket.emit("drawrect", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: this.size, color: color });
+        socket.emit("drawrect", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: size, color: color });
     }
 
     this.active = false;
@@ -105,7 +105,7 @@ DrawRectTool.prototype.clearCursor = function(x, y, px, py) {
 };
 
 function FillRectTool() {
-    this.size = 5;
+    size = 5;
     this.active = false;
     this.w = 2;
     this.s = 10;
@@ -125,7 +125,7 @@ FillRectTool.prototype.mouseMove = function(x, y, px, py, e) {
 
 FillRectTool.prototype.mouseUp = function(x, y) {
     if (receivedBoard && this.active) {
-        socket.emit("fillrect", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: this.size, color: color });
+        socket.emit("fillrect", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: size, color: color });
     }
 
     this.active = false;
@@ -142,7 +142,7 @@ FillRectTool.prototype.clearCursor = function(x, y, px, py) {
 };
 
 function ClearRectTool() {
-    this.size = 5;
+    size = 5;
     this.active = false;
     this.w = 2;
     this.s = 10;
@@ -162,7 +162,7 @@ ClearRectTool.prototype.mouseMove = function(x, y, px, py, e) {
 
 ClearRectTool.prototype.mouseUp = function(x, y) {
     if (receivedBoard && this.active) {
-        socket.emit("clearrect", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: this.size, color: color });
+        socket.emit("clearrect", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: size, color: color });
     }
 
     this.active = false;
@@ -178,7 +178,7 @@ ClearRectTool.prototype.clearCursor = function(x, y, px, py) {
 };
 
 function DrawCircleTool() {
-    this.size = 5;
+    size = 5;
     this.active = false;
     this.w = 2;
     this.s = 10;
@@ -192,13 +192,13 @@ DrawCircleTool.prototype.mouseDown = function(x, y) {
 
 DrawCircleTool.prototype.mouseMove = function(x, y, px, py, e) {
     if (receivedBoard && mouseDown && (e.button === 0 || e.changedTouches)) {
-        canvas.drawCircleInPts(x, y, this.ox, this.oy, color, this.size);
+        canvas.drawCircleInPts(x, y, this.ox, this.oy, color, size);
     }
 };
 
 DrawCircleTool.prototype.mouseUp = function(x, y) {
     if (receivedBoard && this.active) {
-        socket.emit("drawcircle", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: this.size, color: color });
+        socket.emit("drawcircle", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: size, color: color });
     }
 
     this.active = false;
@@ -215,7 +215,7 @@ DrawCircleTool.prototype.clearCursor = function(x, y, px, py) {
 };
 
 function FillCircleTool() {
-    this.size = 5;
+    size = 5;
     this.active = false;
     this.w = 2;
     this.s = 10;
@@ -235,7 +235,7 @@ FillCircleTool.prototype.mouseMove = function(x, y, px, py, e) {
 
 FillCircleTool.prototype.mouseUp = function(x, y) {
     if (receivedBoard && this.active) {
-        socket.emit("fillcircle", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: this.size, color: color });
+        socket.emit("fillcircle", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: size, color: color });
     }
 
     this.active = false;
@@ -252,7 +252,7 @@ FillCircleTool.prototype.clearCursor = function(x, y, px, py) {
 };
 
 function ClearCircleTool() {
-    this.size = 5;
+    size = 5;
     this.active = false;
     this.w = 2;
     this.s = 10;
@@ -272,7 +272,7 @@ ClearCircleTool.prototype.mouseMove = function(x, y, px, py, e) {
 
 ClearCircleTool.prototype.mouseUp = function(x, y) {
     if (receivedBoard && this.active) {
-        socket.emit("clearcircle", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: this.size, color: color });
+        socket.emit("clearcircle", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: size, color: color });
     }
 
     this.active = false;

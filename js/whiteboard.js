@@ -73,13 +73,13 @@ function init() {
     el("fillcircle").onclick = setToolFillCircle;
     el("clearcircle").onclick = setToolClearCircle;
 
-    el("showchat").onclick = toggleChat;
+    //el("showchat").onclick = toggleChat;
     el("save").onclick = saveBoard;
-    el("pickcolor").onclick = pickColor;
-    el("picksize").onclick = pickSize;
+    //el("pickcolor").onclick = pickColor;
+    //el("picksize").onclick = pickSize;
     el("clear").onclick = sendClearBoard;
-    el("sizeok").onclick = sizeOk;
-    el("colorok").onclick = colorOk;
+    el("size").onchange = sizeOk;
+    el("color").onchange = colorOk;
     el("setbg").onclick = pickBackground;
     el("clearbg").onclick = clearBackground;
     el("filepicker").onchange = backgroundPicked;
@@ -282,9 +282,6 @@ function pickColor() {
 
 function sizeOk() {
     size = el("size").value;
-    el("sizePicker").style.display = "none";
-    el("over").style.display = "none";
-    state = "draw";
     //el("canvasArea").style.cursor = "none";
 }
 
