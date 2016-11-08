@@ -46,23 +46,7 @@ function init() {
     drawcanvas.setLineCap("round");
     drawcanvas.setLineJoin("round");
 
-    socket = io.connect("http://68.53.99.168:5080");
-    socket.on("connect", connected);
-    socket.on("disconnect", disconnected);
-    socket.on("draw", drawBoard);
-    socket.on("erase", eraseBoard);
-    socket.on("drawrect", drawRectBoard);
-    socket.on("fillrect", fillRectBoard);
-    socket.on("clearrect", clearRectBoard);
-    socket.on("drawcircle", drawCircleBoard);
-    socket.on("fillcircle", fillCircleBoard);
-    socket.on("clearcircle", clearCircleBoard);
-    socket.on("clear", clearBoard);
-    socket.on("requestboard", sendBoard);
-    socket.on("board", receiveBoard);
-    socket.on("users", displayUsers);
-    socket.on("chat", receiveChat);
-    socket.on("bg", receiveBackground);
+    el("connect").onclick = doConnect;
 
     el("pencil").onclick = setToolPencil;
     el("eraser").onclick = setToolEraser;
@@ -99,6 +83,31 @@ function init() {
     resized();
 }
 
+function doConnect() {
+    var address = el("server").value;
+    connect(address);
+}
+
+function connect(address) {
+    socket = io.connect(address);
+    socket.on("connect", connected);
+    socket.on("disconnect", disconnected);
+    socket.on("draw", drawBoard);
+    socket.on("erase", eraseBoard);
+    socket.on("drawrect", drawRectBoard);
+    socket.on("fillrect", fillRectBoard);
+    socket.on("clearrect", clearRectBoard);
+    socket.on("drawcircle", drawCircleBoard);
+    socket.on("fillcircle", fillCircleBoard);
+    socket.on("clearcircle", clearCircleBoard);
+    socket.on("clear", clearBoard);
+    socket.on("requestboard", sendBoard);
+    socket.on("board", receiveBoard);
+    socket.on("users", displayUsers);
+    socket.on("chat", receiveChat);
+    socket.on("bg", receiveBackground);
+}
+
 function mouseMoved(x, y, m, px, py, e) {
     e.preventDefault();
     moved = true;
@@ -120,7 +129,7 @@ function mouseUp(x, y, px ,py) {
 }
 
 function connected() {
-    console.log("connected");
+    el("landing").style.display = "none";
 }
 
 function disconnected() {

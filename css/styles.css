@@ -6,6 +6,59 @@ body, html {
     background:#060606;
 }
 
+#landing {
+    position: absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    background-color:#EEEEEE;
+    z-index:1000;
+    padding:0;
+    margin:0;
+}
+
+#landingHeader {
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    top:48px;
+    font-size:32px;
+    font-family:Helvetica, sans-serif;
+    color:#111;
+}
+
+#landingStrip {
+    position:absolute;
+    left:50%;
+    top:20%;
+    transform:translate(-50%);
+}
+
+#server {
+    border:0;
+    border-bottom:1px solid #AAA;
+    background-color:transparent;
+    font-size:32px;
+    color:#222;
+    width:480px;
+}
+
+#connect {
+    font-size:32px;
+    border:0;
+    border-radius:5px;
+    background-color:transparent;
+    padding:4px;
+    margin-left:4px;
+    color:#222;
+}
+
+#connect:hover {
+    background-color:#CCC;
+    cursor:pointer;
+}
+
 #canvasArea {
     position:absolute;
     left:160px;
@@ -216,7 +269,7 @@ body, html {
     background:#CCCCCC;
 }
 
-#sendMessage:hover, #chatMessage:hover, #chatMessage:focus
+#sendMessage:hover, #chatMessage:hover, #chatMessage:focus, #server:hover, #server:focus
 {
     border-color:#3333FF;
     color:#3333FF;
