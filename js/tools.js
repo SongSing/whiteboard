@@ -176,3 +176,113 @@ ClearRectTool.prototype.drawCursor = function(x, y) {
 ClearRectTool.prototype.clearCursor = function(x, y, px, py) {
     canvas.clear();
 };
+
+function DrawCircleTool() {
+    this.size = 5;
+    this.active = false;
+    this.w = 2;
+    this.s = 10;
+}
+
+DrawCircleTool.prototype.mouseDown = function(x, y) {
+    this.ox = x;
+    this.oy = y;
+    this.active = true;
+};
+
+DrawCircleTool.prototype.mouseMove = function(x, y, px, py, e) {
+    if (receivedBoard && mouseDown && (e.button === 0 || e.changedTouches)) {
+        canvas.drawCircleInPts(x, y, this.ox, this.oy, color, this.size);
+    }
+};
+
+DrawCircleTool.prototype.mouseUp = function(x, y) {
+    if (receivedBoard && this.active) {
+        socket.emit("drawcircle", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: this.size, color: color });
+    }
+
+    this.active = false;
+};
+
+DrawCircleTool.prototype.drawCursor = function(x, y) {
+
+    canvas.fillRect(x - this.s / 2, y - this.w / 2, this.s, this.w, color);
+    canvas.fillRect(x - this.w / 2, y - this.s / 2, this.w, this.s, color);
+};
+
+DrawCircleTool.prototype.clearCursor = function(x, y, px, py) {
+    canvas.clear();
+};
+
+function FillCircleTool() {
+    this.size = 5;
+    this.active = false;
+    this.w = 2;
+    this.s = 10;
+}
+
+FillCircleTool.prototype.mouseDown = function(x, y) {
+    this.ox = x;
+    this.oy = y;
+    this.active = true;
+};
+
+FillCircleTool.prototype.mouseMove = function(x, y, px, py, e) {
+    if (receivedBoard && mouseDown && (e.button === 0 || e.changedTouches)) {
+        canvas.fillCircleInPts(x, y, this.ox, this.oy, color);
+    }
+};
+
+FillCircleTool.prototype.mouseUp = function(x, y) {
+    if (receivedBoard && this.active) {
+        socket.emit("fillcircle", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: this.size, color: color });
+    }
+
+    this.active = false;
+};
+
+FillCircleTool.prototype.drawCursor = function(x, y) {
+
+    canvas.fillRect(x - this.s / 2, y - this.w / 2, this.s, this.w, color);
+    canvas.fillRect(x - this.w / 2, y - this.s / 2, this.w, this.s, color);
+};
+
+FillCircleTool.prototype.clearCursor = function(x, y, px, py) {
+    canvas.clear();
+};
+
+function ClearCircleTool() {
+    this.size = 5;
+    this.active = false;
+    this.w = 2;
+    this.s = 10;
+}
+
+ClearCircleTool.prototype.mouseDown = function(x, y) {
+    this.ox = x;
+    this.oy = y;
+    this.active = true;
+};
+
+ClearCircleTool.prototype.mouseMove = function(x, y, px, py, e) {
+    if (receivedBoard && mouseDown && (e.button === 0 || e.changedTouches)) {
+        canvas.fillCircleInPts(x, y, this.ox, this.oy, "white");
+    }
+};
+
+ClearCircleTool.prototype.mouseUp = function(x, y) {
+    if (receivedBoard && this.active) {
+        socket.emit("clearcircle", { x1: this.ox, y1: this.oy, x2: x, y2: y, size: this.size, color: color });
+    }
+
+    this.active = false;
+};
+
+ClearCircleTool.prototype.drawCursor = function(x, y) {
+    canvas.fillRect(x - this.s / 2, y - this.w / 2, this.s, this.w, "black");
+    canvas.fillRect(x - this.w / 2, y - this.s / 2, this.w, this.s, "black");
+};
+
+ClearCircleTool.prototype.clearCursor = function(x, y, px, py) {
+    canvas.clear();
+};

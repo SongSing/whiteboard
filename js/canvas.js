@@ -704,6 +704,66 @@ Canvas.prototype.fillCircleInSquare = function(x, y, s, color) {
     ctx.fill();
 };
 
+Canvas.prototype.drawCircleInPts = function(x1, y1, x2, y2, color, lineWidth) {
+    var ctx = this.context();
+
+    if (color !== undefined) {
+        ctx.strokeStyle = color;
+    }
+
+    if (lineWidth !== undefined) {
+        ctx.lineWidth = lineWidth;
+    }
+
+    if (x1 > x2) {
+        var _ = x1;
+        x1 = x2;
+        x2 = _;
+    }
+
+    if (y1 > y2) {
+        var _ = y1;
+        y1 = y2;
+        y2 = _;
+    }
+
+    var w = x2 - x1;
+    var h = y2 - y1;
+
+    ctx.beginPath();
+    ctx.ellipse(x1 + w / 2, y1 + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI, false);
+    ctx.stroke();
+};
+
+
+
+Canvas.prototype.fillCircleInPts = function(x1, y1, x2, y2, color) {
+    var ctx = this.context();
+
+    if (color !== undefined) {
+        ctx.fillStyle = color;
+    }
+
+    if (x1 > x2) {
+        var _ = x1;
+        x1 = x2;
+        x2 = _;
+    }
+
+    if (y1 > y2) {
+        var _ = y1;
+        y1 = y2;
+        y2 = _;
+    }
+
+    var w = x2 - x1;
+    var h = y2 - y1;
+
+    ctx.beginPath();
+    ctx.ellipse(x1 + w / 2, y1 + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI, false);
+    ctx.fill();
+};
+
 /**
  * Draws an image
  * @param  {Image} image    image to draw

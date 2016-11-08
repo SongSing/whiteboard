@@ -12,7 +12,7 @@ var scounter = 0;
 var moved = false;
 var bgdata = "";
 var erasing = false;
-var tool_pencil, tool_eraser, tool_drawRect, tool_fillRect, tool_clearRect;
+var tool_pencil, tool_eraser, tool_drawRect, tool_fillRect, tool_clearRect, tool_drawCircle, tool_fillCircle, tool_clearCircle;
 var tool;
 
 function el(id) {
@@ -27,6 +27,9 @@ function init() {
     tool_drawRect = new DrawRectTool();
     tool_fillRect = new FillRectTool();
     tool_clearRect = new ClearRectTool();
+    tool_drawCircle = new DrawCircleTool();
+    tool_fillCircle = new FillCircleTool();
+    tool_clearCircle = new ClearCircleTool();
 
     setToolPencil();
 
@@ -51,6 +54,9 @@ function init() {
     socket.on("drawrect", drawRectBoard);
     socket.on("fillrect", fillRectBoard);
     socket.on("clearrect", clearRectBoard);
+    socket.on("drawcircle", drawCircleBoard);
+    socket.on("fillcircle", fillCircleBoard);
+    socket.on("clearcircle", clearCircleBoard);
     socket.on("clear", clearBoard);
     socket.on("requestboard", sendBoard);
     socket.on("board", receiveBoard);
@@ -63,6 +69,9 @@ function init() {
     el("drawrect").onclick = setToolDrawRect;
     el("fillrect").onclick = setToolFillRect;
     el("clearrect").onclick = setToolClearRect;
+    el("drawcircle").onclick = setToolDrawCircle;
+    el("fillcircle").onclick = setToolFillCircle;
+    el("clearcircle").onclick = setToolClearCircle;
 
     el("showchat").onclick = toggleChat;
     el("save").onclick = saveBoard;
@@ -86,6 +95,7 @@ function init() {
     el("color").value = color;
 
     window.onresize = resized;
+    resized();
     resized();
 }
 
@@ -145,6 +155,24 @@ function clearRectBoard(data) {
     drawcanvas.setComposition("source-over");
 };
 
+function drawCircleBoard(data) {
+    drawcanvas.setLineCap("square");
+    drawcanvas.setLineJoin("miter");
+    drawcanvas.drawCircleInPts(data.x1, data.y1, data.x2, data.y2, data.color, data.size);
+    drawcanvas.setLineCap("round");
+    drawcanvas.setLineJoin("round");
+};
+
+function fillCircleBoard(data) {
+    drawcanvas.fillCircleInPts(data.x1, data.y1, data.x2, data.y2, data.color);
+};
+
+function clearCircleBoard(data) {
+    drawcanvas.setComposition("destination-out");
+    drawcanvas.fillCircleInPts(data.x1, data.y1, data.x2, data.y2, data.color);
+    drawcanvas.setComposition("source-over");
+};
+
 function clearBoard() {
     drawcanvas.clear();
 }
@@ -183,7 +211,7 @@ function receiveChat(data) {
     var $c = document.createElement("div");
     $c.className = "chatItem";
     $c.textContent = data;
-    $c.innerHTML = "<span style='color:#666666; font-family:Courier New'>" + timestamp() + "</span>&nbsp;" + $c.innerHTML;
+    $c.innerHTML = "<span class='timestamp'>" + timestamp() + "</span>&nbsp;" + $c.innerHTML;
     $container.appendChild($c);
     $container.scrollTop = $container.scrollHeight;
 }
@@ -223,13 +251,13 @@ function toggleChat() {
     var $e = el("chat");
     var $c = el("canvasArea");
 
-    if (getComputedStyle($e).getPropertyValue("display") === "none") {
+    /*if (getComputedStyle($e).getPropertyValue("display") === "none") {
         $e.style.display = "block";
         $c.style.left = getComputedStyle($e).getPropertyValue("width");
     } else {
         $e.style.display = "none";
         $c.style.left = "0";
-    }
+    }*/
 
     resized();
     canvas.deepCalcPosition();
@@ -320,6 +348,36 @@ function setToolClearRect() {
     el("clearrect").setAttribute("toggled", true);
 }
 
+function setToolDrawCircle() {
+    tool = tool_drawCircle;
+    var t = document.getElementsByClassName("tool");
+
+    for (var i = 0; i < t.length; i++) {
+        t[i].setAttribute("toggled", false);
+    }
+    el("drawcircle").setAttribute("toggled", true);
+}
+
+function setToolFillCircle() {
+    tool = tool_fillCircle;
+    var t = document.getElementsByClassName("tool");
+
+    for (var i = 0; i < t.length; i++) {
+        t[i].setAttribute("toggled", false);
+    }
+    el("fillcircle").setAttribute("toggled", true);
+}
+
+function setToolClearCircle() {
+    tool = tool_clearCircle;
+    var t = document.getElementsByClassName("tool");
+
+    for (var i = 0; i < t.length; i++) {
+        t[i].setAttribute("toggled", false);
+    }
+    el("clearcircle").setAttribute("toggled", true);
+}
+
 function sendClearBoard() {
     if (receivedBoard) {
         socket.emit("clear");
@@ -351,16 +409,34 @@ function saveBoard() {
 
 function resized() {
     var $e = el("canvasArea");
-    var ar = $e.offsetWidth / $e.offsetHeight;
-    var car = canvas.width() / canvas.height();
+    var $s = el("sidebar");
 
-    if (ar < car) {
-        canvas.canvas.style.width = drawcanvas.canvas.style.width = "100%";
-        canvas.canvas.style.height = drawcanvas.canvas.style.height = "auto";
+    var minChatWidth = 300;
+
+    var workingWidth = document.body.clientWidth - $s.offsetWidth - minChatWidth;
+    var workingHeight = $e.offsetHeight;
+
+    var aspectRatio = canvas.width() / canvas.height();
+    var workingAspectRatio = workingWidth / workingHeight;
+
+    var left = document.body.clientWidth - minChatWidth;
+
+    // greater means wider
+    
+    if (workingAspectRatio > aspectRatio) {
+        canvas.canvas.style.height = workingHeight + "px";
+        canvas.canvas.style.width = "auto";
+        drawcanvas.canvas.style.height = workingHeight + "px";
+        drawcanvas.canvas.style.width = "auto";
+        left = Math.floor($s.offsetWidth + aspectRatio * workingHeight);
     } else {
-        canvas.canvas.style.width = drawcanvas.canvas.style.width = "auto";
-        canvas.canvas.style.height = drawcanvas.canvas.style.height = "100%";
+        canvas.canvas.style.width = workingWidth + "px";
+        canvas.canvas.style.height = "auto";
+        drawcanvas.canvas.style.width = workingWidth + "px";
+        drawcanvas.canvas.style.height = "auto";
     }
+
+     el("chat").style.left = left + "px";
 }
 
 window.onload = function() {

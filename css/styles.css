@@ -3,15 +3,16 @@ body, html {
     padding:0;
     width:100%;
     height:100%;
+    background:#060606;
 }
 
 #canvasArea {
     position:absolute;
-    left:0;
+    left:160px;
     top:0;
     bottom:0;
-    right:160px;
     background:#060606;
+    box-sizing:border-box;
 }
 
 #canvasArea > * {
@@ -50,22 +51,28 @@ body, html {
 #canvas {
     z-index:2;
     background-color:transparent;
+    position:absolute;
+    left:0px;
 }
 
 #drawcanvas {
     z-index:1;
     background-color:white;
     background-size:100% 100%;
+    position:absolute;
+    left:0px;
 }
 
 #sidebar {
     position:absolute;
     top:0;
-    right:0;
+    left:0;
     bottom:0;
     width:160px;
     background-color:#444444;
     text-align:center;
+    box-sizing:border-box;
+    border-right:1px dotted #DDDDDD;
 }
 
 .sidebtn {
@@ -79,15 +86,19 @@ body, html {
     cursor:pointer;
 }
 
-.tool[toggled=true] {
+.tool {
+    margin:0;
+    box-sizing:border-box;
+    border:0px;
+    float:left;
+    width:50%;
     background-color:#CCCCCC;
-    color:#222222;
-    font-weight:bold;
 }
 
-.tool[toggled=true]:hover {
-    background-color:#BBBBBB;
+.tool[toggled=true] {
+    background-color:#EEEEEE;
     color:#222222;
+    font-weight:bold;
 }
 
 .sidebtn:hover {
@@ -98,10 +109,18 @@ body, html {
     background:#FFFFFF;
 }
 
+
+
+.tool:hover {
+    background-color:#EAEAEA;
+}
+
 .sideheader {
     color:white;
     background:#111111;
     font-weight:bold;
+    width:100%;
+    display:inline-block;
 }
 
 .sidebtn-bottom {
@@ -138,14 +157,13 @@ body, html {
 {
     position:absolute;
     top:0;
-    left:0;
+    right:0;
     bottom:0px;
-    width:240px;
     border-right:1px solid #aaaaaa;
     box-sizing:border-box;
     z-index:5;
-    background:white;
-    display:none;
+    background:#EEE;
+    border-left:1px dotted #222222;
 }
 
 #chatMessage
@@ -153,12 +171,10 @@ body, html {
     position:absolute;
     bottom:4px;
     left:4px;
-    width:calc(100% - 60px);
-    border:1px solid #aaaaaa;
-    background-color:white;
-    border-radius:3px;
-    border-top-right-radius:0;
-    border-bottom-right-radius:0;
+    width:calc(100% - 68px);
+    border:0;
+    border-bottom:1px solid #aaaaaa;
+    background-color:transparent;
     padding:0px 8px;
     box-sizing:border-box;
     height:32px;
@@ -169,19 +185,16 @@ body, html {
     position:absolute;
     bottom:4px;
     right:4px;
-    border:1px solid #aaaaaa;
-    background-color:white;
-    border-radius:3px;
-    border-top-left-radius:0;
-    border-bottom-left-radius:0;
+    background-color:transparent;
     padding:0px 8px;
     box-sizing:border-box;
     height:32px;
+    border:0;
+    border-radius:4px;
 }
 
 #chatMessageContainer
 {
-    border-bottom:1px solid #aaaaaa;
     padding:0px;
     position:absolute;
     top:0px;
@@ -190,7 +203,7 @@ body, html {
     bottom:40px;
     overflow-x:auto;
     overflow-y:auto;
-    background:#FAFAFA;
+    background:#CCCCCC;
 }
 
 #sendMessage:hover, #chatMessage:hover, #chatMessage:focus
@@ -198,6 +211,10 @@ body, html {
     border-color:#3333FF;
     color:#3333FF;
     z-index:1;
+}
+
+#sendMessage:hover {
+    background:#DDD;
 }
 
 #sendMessage:active
@@ -223,7 +240,13 @@ body, html {
 
 .chatItem
 {
-    background:#EDEDFF;
+    background:#EEEEFF;
+    color:#111111;
+}
+
+.timestamp {
+    color:#666;
+    font-family:Courier New;
 }
 
 .chatItem:last-child
