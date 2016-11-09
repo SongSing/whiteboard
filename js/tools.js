@@ -29,7 +29,7 @@ PencilTool.prototype.drawCursor = function(x, y, px, py) {
 };
 
 PencilTool.prototype.clearCursor = function(x, y, px, py) {
-    canvas.clearRect(px - size / 2 - 1, py - size / 2 - 1, size + 2, size + 2);
+    canvas.clear();
 };
 
 
@@ -64,7 +64,7 @@ EraserTool.prototype.drawCursor = function(x, y, px, py) {
 };
 
 EraserTool.prototype.clearCursor = function(x, y, px, py) {
-    canvas.clearRect(px - size / 2 - 1, py - size / 2 - 1, size + 2, size + 2);
+    canvas.clear();
 };
 
 function DrawRectTool() {

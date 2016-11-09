@@ -184,6 +184,7 @@ function clearCircleBoard(data) {
 
 function clearBoard() {
     drawcanvas.clear();
+    canvas.clear();
 }
 
 function sendBoard() {
