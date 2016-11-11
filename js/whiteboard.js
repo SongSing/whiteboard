@@ -22,6 +22,13 @@ function el(id) {
 function noop() {}
 
 function init() {
+    el("connect").onclick = doConnect;
+}
+
+function initCanvas(data) {
+    resw = data.res[0];
+    resh = data.res[1];
+
     tool_pencil = new PencilTool();
     tool_eraser = new EraserTool();
     tool_drawRect = new DrawRectTool();
@@ -45,8 +52,6 @@ function init() {
 
     drawcanvas.setLineCap("round");
     drawcanvas.setLineJoin("round");
-
-    el("connect").onclick = doConnect;
 
     el("pencil").onclick = setToolPencil;
     el("eraser").onclick = setToolEraser;
@@ -81,6 +86,11 @@ function init() {
     window.onresize = resized;
     resized();
     resized();
+
+    receiveBoard(data.board);
+    receiveBackground(data.bg);
+
+    el("landing").style.display = "none";
 }
 
 function doConnect() {
@@ -90,6 +100,7 @@ function doConnect() {
 
 function connect(address) {
     socket = io.connect(address);
+    socket.on("init", initCanvas);
     socket.on("connect", connected);
     socket.on("disconnect", disconnected);
     socket.on("draw", drawBoard);
@@ -129,11 +140,12 @@ function mouseUp(x, y, px ,py) {
 }
 
 function connected() {
-    el("landing").style.display = "none";
+    console.log("connected!");
 }
 
 function disconnected() {
-    alert("you have been disconnected from the server :~P");
+    console.log("you have been disconnected from the server :~P");
+    document.getElementById("landing").style.display = "block";
 }
 
 function drawBoard(data) {
@@ -192,7 +204,7 @@ function sendBoard() {
 }
 
 function receiveBoard(data) {
-    data = typeof(data) === "string" ? data : new TextDecoder("utf8").decode(data);
+    //data = typeof(data) === "string" ? data : new TextDecoder("utf8").decode(data);
     drawcanvas.drawDataURL(data, 0, 0, resw, resh, function() {
         receivedBoard = true;
 
@@ -240,6 +252,7 @@ function backgroundPicked() {
     Canvas.fileToImage(file, function(img) {
         var durl = Canvas.imageToDataURL(img, shrinkage);
         socket.emit("bg", durl);
+        el("filepicker").value = "";
     });
 }
 
