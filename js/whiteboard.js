@@ -14,6 +14,37 @@ var bgdata = "";
 var erasing = false;
 var tool_pencil, tool_eraser, tool_drawRect, tool_fillRect, tool_clearRect, tool_drawCircle, tool_fillCircle, tool_clearCircle;
 var tool;
+var sep = "\\";
+
+function IOSocket(socket) {
+    var self = this;
+    this.events = {};
+    this.socket = socket;
+
+    this.socket.onmessage = function(e) {
+        var key = e.data.split(sep)[0];
+        var data = (e.data.length - sep.length === key.length ? ""
+            : JSON.parse(e.data.substr(e.data.indexOf(sep) + sep.length)));
+
+        /*console.log(self.events);
+        console.log(e);
+        console.log(key);
+        console.log(data);
+        console.log("~~~~~");*/
+
+        if (self.events.hasOwnProperty(key)) {
+           self.events[key].call(self, data);
+       }
+    };
+}
+
+IOSocket.prototype.on = function(key, fn) {
+    this.events[key] = fn;
+};
+
+IOSocket.prototype.emit = function(key, data) {
+    this.socket.send(key + sep + (data === undefined ? "" : JSON.stringify(data)));
+};
 
 function el(id) {
     return document.getElementById(id);
@@ -99,10 +130,10 @@ function doConnect() {
 }
 
 function connect(address) {
-    socket = io.connect(address);
+    socket = new IOSocket(new SockJS(address));
+    socket.socket.onopen = connected;
+    socket.socket.onclose = disconnected;
     socket.on("init", initCanvas);
-    socket.on("connect", connected);
-    socket.on("disconnect", disconnected);
     socket.on("draw", drawBoard);
     socket.on("erase", eraseBoard);
     socket.on("drawrect", drawRectBoard);
