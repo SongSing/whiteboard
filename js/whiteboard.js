@@ -23,7 +23,7 @@ function IOSocket(socket) {
 
     this.socket.onmessage = function(e) {
         var key = e.data.split(sep)[0];
-        var data = (e.data.length - sep.length === key.length ? ""
+        var data = (e.data.length - sep.length === key.length ? undefined
             : JSON.parse(e.data.substr(e.data.indexOf(sep) + sep.length)));
 
         /*console.log(self.events);
