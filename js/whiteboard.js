@@ -26,6 +26,8 @@ function IOSocket(socket) {
         var data = (e.data.length - sep.length === key.length ? undefined
             : JSON.parse(e.data.substr(e.data.indexOf(sep) + sep.length)));
 
+        //console.log(e.data);
+
         /*console.log(self.events);
         console.log(e);
         console.log(key);
@@ -235,6 +237,13 @@ function sendBoard() {
 }
 
 function receiveBoard(data) {
+    if (!data) {
+        clearBoard();
+        receivedBoard = true;
+        return;
+    }
+
+    console.log(data);
     //data = typeof(data) === "string" ? data : new TextDecoder("utf8").decode(data);
     drawcanvas.drawDataURL(data, 0, 0, resw, resh, function() {
         receivedBoard = true;
@@ -288,7 +297,7 @@ function backgroundPicked() {
 }
 
 function receiveBackground(data) {
-    if (data === "") {
+    if (!data) {
         el("drawcanvas").style["background-image"] = "";
     } else {
         el("drawcanvas").style["background-image"] = "url(" + data + ")";
