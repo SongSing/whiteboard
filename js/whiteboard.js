@@ -80,8 +80,8 @@ function initCanvas(data) {
     canvas.setMouseUp(mouseUp);
     canvas.setMouseMove(mouseMoved);
 
-    canvas.resize(resw, resh);
-    drawcanvas.resize(resw, resh);
+    canvas.resize(resw, resh, false);
+    drawcanvas.resize(resw, resh, false);
 
     drawcanvas.setLineCap("round");
     drawcanvas.setLineJoin("round");
@@ -233,24 +233,30 @@ function clearBoard() {
 }
 
 function sendBoard() {
-    if (receivedBoard) socket.emit("board", drawcanvas.toDataURL());
+    if (receivedBoard) {
+        socket.emit("board", drawcanvas.toDataURL());
+    }
 }
 
 function receiveBoard(data) {
+    var unload = function(e) {
+        sendBoard();
+    };
+
+    setInterval(sendBoard, 60000);
+
     if (!data) {
         clearBoard();
         receivedBoard = true;
+        window.onbeforeunload = unload;
         return;
     }
 
-    console.log(data);
+    //console.log(data);
     //data = typeof(data) === "string" ? data : new TextDecoder("utf8").decode(data);
     drawcanvas.drawDataURL(data, 0, 0, resw, resh, function() {
         receivedBoard = true;
-
-        window.onbeforeunload = function() {
-            sendBoard(); 
-        };
+        window.onbeforeunload = unload;
     });
 }
 

@@ -115,14 +115,18 @@ Canvas.prototype.setMouseMove = function(fn) {
  * @param {Function} fn function to be called on mousedown/touchstart
  */
 Canvas.prototype.setMouseDown = function(fn) {
-    this.mouseDown = fn;
     var self = this;
+    self.mouseDown = fn;
+    //console.log("main:");
+    //console.log(self);
 
     this.canvas.addEventListener("mousedown", function(e) {
         var p = self.pos(e);
         self.mouseIsDown = true;
         self.lastPos = p;
         self.mouseDown(p.x, p.y, e);
+        //console.log("listener:");
+        //console.log(self);
     });
 
     this.canvas.addEventListener("touchstart", function(e) {
