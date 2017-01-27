@@ -18,8 +18,8 @@ PencilTool.prototype.mouseMove = function(x, y, px, py, e) {
     }
 };
 
-PencilTool.prototype.mouseUp = function(x, y, px, py) {
-    if (receivedBoard && !moved) {
+PencilTool.prototype.mouseUp = function(x, y, px, py, e) {
+    if (receivedBoard && !moved && (e.button === 0 || e.changedTouches)) {
         socket.emit("draw", { x1: x, x2: px, y1: y, y2: py, size: size, color: color });
     }
 };

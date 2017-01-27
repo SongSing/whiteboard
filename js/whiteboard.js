@@ -76,9 +76,70 @@ function initCanvas(data) {
     drawcanvas = new Canvas(el("drawcanvas"));
 
     canvas = new Canvas(el("canvas"));
-    canvas.setMouseDown(mouseDown);
-    canvas.setMouseUp(mouseUp);
-    canvas.setMouseMove(mouseMoved);
+
+    var b = document.body;
+    b.addEventListener("mousemove", function(e) {
+        e.pageX += canvas.canvas.offsetLeft;
+        e.pageY += canvas.canvas.offsetTop;
+
+        if (e.changedTouches) {
+            e.changedTouches[0].pageX += canvas.canvas.offsetLeft;
+            e.changedTouches[0].pageY += canvas.canvas.offsetTop;
+        }
+
+        var p = canvas.pos(e);
+        if (canvas.lastPos === undefined) canvas.lastPos = p;
+        if (mouseMoved(p.x, p.y, canvas.mouseIsDown, canvas.lastPos.x, canvas.lastPos.y, e) !== false) {
+            canvas.lastPos = p;
+        }
+    });
+    b.addEventListener("touchmove", function(e) {
+        e.pageX += canvas.canvas.offsetLeft;
+        e.pageY += canvas.canvas.offsetTop;
+
+        if (e.changedTouches) {
+            e.changedTouches[0].pageX += canvas.canvas.offsetLeft;
+            e.changedTouches[0].pageY += canvas.canvas.offsetTop;
+        }
+
+        var p = canvas.pos(e);
+        if (canvas.lastPos === undefined) canvas.lastPos = p;
+        if (mouseMoved(p.x, p.y, canvas.mouseIsDown, canvas.lastPos.x, canvas.lastPos.y, e) !== false) {
+            canvas.lastPos = p;
+        }
+    });
+    b.addEventListener("mouseup", function(e) {
+        e.pageX += canvas.canvas.offsetLeft;
+        e.pageY += canvas.canvas.offsetTop;
+
+        if (e.changedTouches) {
+            e.changedTouches[0].pageX += canvas.canvas.offsetLeft;
+            e.changedTouches[0].pageY += canvas.canvas.offsetTop;
+        }
+
+        var p = canvas.pos(e);
+        canvas.mouseIsDown = false;
+        mouseUp(p.x, p.y, canvas.lastPos.x, canvas.lastPos.y, e);
+        canvas.lastPos = p;
+    });
+    b.addEventListener("touchend", function(e) {
+        e.pageX += canvas.canvas.offsetLeft;
+        e.pageY += canvas.canvas.offsetTop;
+
+        if (e.changedTouches) {
+            e.changedTouches[0].pageX += canvas.canvas.offsetLeft;
+            e.changedTouches[0].pageY += canvas.canvas.offsetTop;
+        }
+
+        var p = canvas.pos(e);
+        canvas.mouseIsDown = false;
+        mouseUp(p.x, p.y, canvas.lastPos.x, canvas.lastPos.y, e);
+        canvas.lastPos = p;
+    });
+
+    canvas.setMouseDown(mouseDownFn);
+    //canvas.setMouseUp(mouseUp);
+    //canvas.setMouseMove(mouseMoved);
 
     canvas.resize(resw, resh, false);
     drawcanvas.resize(resw, resh, false);
@@ -163,13 +224,13 @@ function mouseMoved(x, y, m, px, py, e) {
     tool.drawCursor(x, y, px, py, e);
 }
 
-function mouseDown(x, y) {
+function mouseDownFn(x, y) {
     moved = false;
     tool.mouseDown(x, y);
 }
 
-function mouseUp(x, y, px ,py) {
-    tool.mouseUp(x, y, px, py);
+function mouseUp(x, y, px, py, e) {
+    tool.mouseUp(x, y, px, py, e);
 }
 
 function connected() {
