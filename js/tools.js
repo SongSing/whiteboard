@@ -3,21 +3,24 @@ function initTools() {
         count: 0,
         name: "Pencil",
         src: "img/paintbrush.png",
-        mouseMove: function(x, y, lx, ly, e) {
-            this.count++;
+        drawCursor: function(x, y, lx, ly, e) {
             var r = settings.size / 2;
+            canvas_fx.drawCircle(x, y, r, settings.color, 2);
+            canvas_fx.drawCircle(x, y, r, "black", 1);
+            canvas_fx.setLineDash([2]);
+            canvas_fx.drawCircle(x, y, r, "white", 1);
+            canvas_fx.setLineDash([]);
+        },
+        clearCursor: function(x, y, lx, ly, e) {
+            this.count++;
             if (this.count === 100) {
                 canvas_fx.clear();
                 this.count = 0;
             } else {
                 canvas_fx.clearRect(lx - settings.size - 4, ly - settings.size - 4, settings.size * 2 + 8, settings.size * 2 + 8);
             }
-
-            canvas_fx.drawCircle(x, y, r, settings.color, 2);
-            canvas_fx.drawCircle(x, y, r, "black", 1);
-            canvas_fx.setLineDash([2]);
-            canvas_fx.drawCircle(x, y, r, "white", 1);
-            canvas_fx.setLineDash([]);
+        },
+        mouseMove: function(x, y, lx, ly, e) {
 
             if (receivedBoard && mouseIsDown && (e.button === 0 || e.changedTouches)) {
                 socket.emit("draw", { x1: lx, x2: x, y1: ly, y2: y, size: settings.size, color: settings.color });
@@ -34,11 +37,21 @@ function initTools() {
     tools.eraser = {
         name: "Eraser",
         src: "img/eraser.png",
-        mouseMove: function(x, y, lx, ly, e) {
-            canvas_fx.clear();
+        count: 0,
+        drawCursor: function(x, y, lx, ly, e) {
             canvas_fx.drawCircle(x, y, settings.size / 2, "black", 2);
             canvas_fx.drawCircle(x, y, settings.size / 2, "white", 1);
-
+        },
+        clearCursor: function(x, y, lx, ly, e) {
+            this.count++;
+            if (this.count === 100) {
+                canvas_fx.clear();
+                this.count = 0;
+            } else {
+                canvas_fx.clearRect(lx - settings.size - 4, ly - settings.size - 4, settings.size * 2 + 8, settings.size * 2 + 8);
+            }
+        },
+        mouseMove: function(x, y, lx, ly, e) {
             if (receivedBoard && mouseIsDown && (e.button === 0 || e.changedTouches)) {
                 socket.emit("erase", { x1: lx, x2: x, y1: ly, y2: y, size: settings.size, color: settings.color });
             }
@@ -59,17 +72,21 @@ function initTools() {
         active: false,
         w: 2,
         s: 10,
-        mouseMove: function(x, y, lx, ly, e) {
-            canvas_fx.clear();
-            if (receivedBoard && mouseIsDown && (e.button === 0 || e.touchedChanges)) {
-                canvas_fx.drawRectPts(x, y, this.ox, this.oy, settings.color, settings.size);
-            }
-
+        drawCursor: function(x, y, lx, ly, e) {
             canvas_fx.fillRect(x - this.s / 2, y - this.w / 2, this.s, this.w, settings.color);
             canvas_fx.fillRect(x - this.w / 2, y - this.s / 2, this.w, this.s, settings.color);
         },
+        clearCursor: function(x, y, lx, ly, e) {
+            //canvas.clear();
+        },
+        mouseMove: function(x, y, lx, ly, e) {
+            canvas_fx.clear();
+            if (receivedBoard && mouseIsDown && (e.button === 0 || e.changedTouches)) {
+                canvas_fx.drawRectPts(x, y, this.ox, this.oy, settings.color, settings.size);
+            }
+        },
         mouseDown: function(x, y, e) {
-            if (receivedBoard  && (e.button === 0 || e.touchedChanges)) {
+            if (receivedBoard  && (e.button === 0 || e.changedTouches)) {
                 this.ox = x;
                 this.oy = y;
                 this.active = true;
@@ -94,17 +111,21 @@ function initTools() {
         active: false,
         w: 2,
         s: 10,
-        mouseMove: function(x, y, lx, ly, e) {
-            canvas_fx.clear();
-            if (receivedBoard && mouseIsDown && (e.button === 0 || e.touchedChanges)) {
-                canvas_fx.drawCircleInPts(x, y, this.ox, this.oy, settings.color, settings.size);
-            }
-
+        drawCursor: function(x, y, lx, ly, e) {
             canvas_fx.fillRect(x - this.s / 2, y - this.w / 2, this.s, this.w, settings.color);
             canvas_fx.fillRect(x - this.w / 2, y - this.s / 2, this.w, this.s, settings.color);
         },
+        clearCursor: function(x, y, lx, ly, e) {
+            //canvas.clear();
+        },
+        mouseMove: function(x, y, lx, ly, e) {
+            canvas_fx.clear();
+            if (receivedBoard && mouseIsDown && (e.button === 0 || e.changedTouches)) {
+                canvas_fx.drawCircleInPts(x, y, this.ox, this.oy, settings.color, settings.size);
+            }
+        },
         mouseDown: function(x, y, e) {
-            if (receivedBoard  && (e.button === 0 || e.touchedChanges)) {
+            if (receivedBoard  && (e.button === 0 || e.changedTouches)) {
                 this.ox = x;
                 this.oy = y;
                 this.active = true;

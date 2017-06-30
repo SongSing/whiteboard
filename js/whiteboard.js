@@ -12,6 +12,8 @@ var settings = {
 var currentTool;
 var mouseIsDown = false;
 var workingImg;
+var borderTimer;
+var borderSwitch = false;
 
 var handlers = {
     connect: function(data) {
@@ -105,14 +107,19 @@ function init() {
     }
 
     canvas_fx.setMouseMove(function(x, y, md, lx, ly, e) {
+        e.preventDefault();
+        currentTool.clearCursor(x, y, lx, ly, e);
         currentTool.mouseMove(x, y, lx, ly, e);
+        currentTool.drawCursor(x, y, lx, ly, e);
     });
 
     canvas_fx.setMouseDown(function(x, y, e) {
+        e.preventDefault();
         if (e.button === 0 || e.changedTouches) {
             mouseIsDown = true;
         }
 
+        //canvas_fx.clear();
         currentTool.mouseDown(x, y, e);
         toggleTools(false);
         toggleSize(false);
@@ -124,7 +131,8 @@ function init() {
         currentTool.mouseUp(x, y, e);
     });*/
 
-    document.body.addEventListener("mouseup", function(e) {
+    var mu = function(e) {
+        //e.preventDefault();
         if (!receivedBoard) return;
         e.pageX += canvas_fx.canvas.offsetLeft;
         e.pageY += canvas_fx.canvas.offsetTop;
@@ -132,6 +140,7 @@ function init() {
         if (e.changedTouches) {
             e.changedTouches[0].pageX += canvas_fx.canvas.offsetLeft;
             e.changedTouches[0].pageY += canvas_fx.canvas.offsetTop;
+            canvas_fx.clear();
         }
 
         var p = canvas_fx.pos(e);
@@ -139,7 +148,10 @@ function init() {
         if (canvas_fx.lastPos === undefined) canvas_fx.lastPos = p;
         currentTool.mouseUp(p.x, p.y, canvas_fx.lastPos.x, canvas_fx.lastPos.y, e);
         canvas_fx.lastPos = p;
-    });
+    };
+
+    document.body.addEventListener("mouseup", mu);
+    document.body.addEventListener("touchend", mu);
 
     initTools();
     setCurrentTool(tools.pencil);
@@ -180,11 +192,18 @@ function init() {
     });
     document.getElementById("tool-img").addEventListener("change", function() {
         if (!this.files[0]) return;
-        document.getElementById("tool-img-label").style.display = "none";
+        //document.getElementById("tool-img-label").style.opacity = "0";
         document.getElementById("tool-confirm").style.display = "inline-block";
+        toggleOver(true);
+        var $hint = document.getElementById("container-boardhint");
+        borderTimer = setInterval(function() {
+            $hint.style["border-color"] = borderSwitch ? "black" : "white";
+            borderSwitch = !borderSwitch;
+        }, 1000);
+
         var file = this.files[0];
 
-        Canvas.fileToImage(file, function(img) {
+        Canvas.fileToImage(file, (function(img) {
             var src = img.src;
             workingImg = img;
             var w = img.width;
@@ -205,54 +224,71 @@ function init() {
             $d.style.top = "0px";
             $d.style.width = w + "px";
             $d.style.height = h + "px";
-            $d.style["z-index"] = "900";
+            $d.style["z-index"] = "1500";
             $d.style.overflow = "auto";
 
-            $d.addEventListener("mousedown", function(e) {
+            var md = function(e) {
                 var r = this.getBoundingClientRect();
-                var _x = e.clientX - r.left;
-                var _y = e.clientY - r.top;
+                if (e.changedTouches) {
+                    e.pageX = e.changedTouches[0].pageX;
+                    e.pageY = e.changedTouches[0].pageY;
+                }
+                var _x = e.pageX - r.left;
+                var _y = e.pageY - r.top;
                 if (this.offsetWidth - _x < 20 && this.offsetHeight - _y < 20) {
                     return;
                 }
 
-                this.ox = e.clientX;
-                this.oy = e.clientY;
+                this.ox = e.pageX;
+                this.oy = e.pageY;
                 this.sx = getComputedStyle(this).left;
                 this.sy = getComputedStyle(this).top;
                 this.sx = parseInt(this.sx.substr(0, this.sx.length - 2));
                 this.sy = parseInt(this.sy.substr(0, this.sy.length - 2));
                 this.down = true;
-            });
+            };
 
-            $d.addEventListener("mousemove", function(e) {
+            var mm = function(e) {
+                e.preventDefault();
                 if (this.down) {
-                    var dx = e.clientX - this.ox;
-                    var dy = e.clientY - this.oy;
+                    if (e.changedTouches) {
+                        e.pageX = e.changedTouches[0].pageX;
+                        e.pageY = e.changedTouches[0].pageY;
+                    }
+                    var dx = e.pageX - this.ox;
+                    var dy = e.pageY - this.oy;
                     this.style.left = this.sx + dx + "px";
                     this.style.top = this.sy + dy + "px";
                 }
-            });
+            };
 
-            $d.addEventListener("mouseup", function(e) {
+            var mu = function(e) {
                 this.down = false;
-            });
+            };
 
-            document.getElementById("container-board").appendChild($d);
-            this.value = "";
-        });
+            $d.addEventListener("mousedown", md);
+            $d.addEventListener("touchstart", md);
+            $d.addEventListener("mousemove", mm);
+            $d.addEventListener("touchmove", mm);
+            $d.addEventListener("mouseup", mu);
+            $d.addEventListener("touchend", mu);
+
+            document.getElementById("container-over").appendChild($d);
+            this.value = null;
+        }).bind(this));
     });
     document.getElementById("tool-confirm").addEventListener("click", function() {
-        document.getElementById("tool-img-label").style.display = "inline-block";
+        document.getElementById("tool-img-label").style.opacity = "1";
         document.getElementById("tool-confirm").style.display = "none";
+        clearInterval(borderTimer);
         var $i = document.getElementsByClassName("img")[0];
         var r = $i.getBoundingClientRect();
 
         var scale = canvas_main.width() / canvas_main.canvas.offsetWidth;
         var w = r.width * scale;
         var h = r.height * scale;
-        var x = r.x * scale;
-        var y = (r.y - 64) * scale;
+        var x = r.left * scale;
+        var y = (r.top - 64) * scale;
 
         var c = new Canvas(document.createElement("canvas"));
         c.resize(w, h, false);
@@ -265,7 +301,8 @@ function init() {
             height: h
         });
 
-        document.getElementById("container-board").removeChild($i);
+        document.getElementById("container-over").removeChild($i);
+        toggleOver(false);
     });
 
 
@@ -305,6 +342,19 @@ function toggleSize(z) {
 
 function toggleMenu(z) {
     var $t = document.getElementById("container-menu");
+    var visible = getComputedStyle($t).display !== "none";
+    if (z === true || z === false) visible = !z;
+    if (visible) {
+        $t.style.display = "none";
+    } else {
+        $t.style.display = "inline-block";
+        toggleTools(false);
+        toggleSize(false);
+    }
+}
+
+function toggleOver(z) {
+    var $t = document.getElementById("container-over");
     var visible = getComputedStyle($t).display !== "none";
     if (z === true || z === false) visible = !z;
     if (visible) {
@@ -474,6 +524,15 @@ function resized() {
 
     document.getElementById("container-chat").style.left = left + "px";
     document.getElementById("container-boardarea").style.width = left + "px";
+
+    var $hint = document.getElementById("container-boardhint");
+    var r = canvas_fx.canvas.getBoundingClientRect();
+    $hint.style.width = r.width + "px";
+    $hint.style.height = r.height + "px";
+    $hint.style.top = r.top + "px";
+    $hint.style.left = r.left + "px";
+
+    document.getElementById("tool-confirm").style.left = (r.width - 192) + "px";
 
     applyToCanvas(function(cc) {
         cc.deepCalcPosition();
