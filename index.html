@@ -1,62 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
     <head>
-        <meta charset="UTF-8">
-
-        <title>Whiteboard</title>
-        
-        <script src="js/colors/jscolor.js"></script>
-        <script src="js/sockjs-1.1.1.min.js"></script>
+        <link rel="stylesheet" href="css/style.css"></link>
+        <!--<script src="js/jquery-2.1.4.min.js"></script>-->
+        <script src="js/socket.io.slim.js"></script>
+        <script src="js/socket.middleman.js"></script>
         <script src="js/canvas.js"></script>
-        <script src="js/tools.js"></script>
         <script src="js/whiteboard.js"></script>
-        
-        <link rel="stylesheet" href="css/styles.css"></link>
+        <script src="js/tools.js"></script>
+        <meta charset="UTF-8">
     </head>
     <body>
-        <div id="landing">
-            <div id="landingHeader">online white board by me</div>
-            <div id="landingStrip">
-                <input id="server" title="http://(ip)/wb/(room)" value="http://68.53.99.168/wb/lobby" />
+        <div id="container-landing">
+            <div id="landing-header">welcome hard</div>
+            <div id="landing-strip">
+                Server: <input id="server" title="Server Address" value="http://75.143.145.134:5080/" />
+                Room: <input id="server-room" title="Room" value="lobby" />
                 <button id="connect">Connect.</button>
             </div>
         </div>
-        <div id="canvasArea">
-            <canvas id="canvas"></canvas>
-            <canvas id="drawcanvas"></canvas>
-            <div id="over">
-                <div id="sizePicker" class="picker">
-                    <button id="sizeok" class="ok">OK</button>
+        <div id="container">
+            <div id="container-boardarea">
+                <div id="container-toolbar" class="primary">
+                    <div id="container-mycolor">
+                        <div id="color-mycolor" class="color" color="#000000"></div>
+                    </div>
+                    <div id="container-colors">
+                        <div id="color-black" class="color" color="#000000"></div>
+                        <div id="color-white" class="color" color="#FFFFFF"></div>
+                        <div id="color-violet" class="color" color="#9400D3"></div>
+                        <div id="color-indigo" class="color" color="#4B0082"></div>
+                        <div id="color-blue" class="color" color="#0000FF"></div>
+                        <div id="color-green" class="color" color="#00FF00"></div>
+                        <div id="color-yellow" class="color" color="#FFFF00"></div>
+                        <div id="color-orange" class="color" color="#FF7F00"></div>
+                        <div id="color-red" class="color" color="#FF0000"></div>
+                    </div>
+                    <div id="container-misc">
+                        <div id="tool-tool" class="misc" title="Tools"></div>
+                        <div id="tool-size" class="misc" title="Size"></div>
+                        <input id="tool-img" type="file" />
+                        <label for="tool-img" class="misc" title="Image" id="tool-img-label"></label>
+                        <div id="tool-confirm" class="misc" title="Confirm Image"></div>
+                        <div id="tool-menu" class="misc" title="Menu"></div>
+                    </div>
                 </div>
-                <div id="colorPicker" class="picker">
-                    <button id="colorok" class="ok">OK</button>
+                <div id="container-board">
+                    <canvas id="canvas-fx" class="canvas-board"></canvas>
+                    <canvas id="canvas-top" class="canvas-board"></canvas>
+                    <canvas id="canvas-main" class="canvas-board"></canvas>
+                    <canvas id="canvas-bottom" class="canvas-board"></canvas>
+                </div>
+                <div id="container-tools" class="dark">
+                </div>
+                <div id="container-size" class="dark">
+                    <input id="input-size" type="range" min="1" max="200" step="1" value="5"/>
+                </div>
+                <div id="container-menu" class="dark">
+                    <button id="menu-save" class="dark menu-item">Save Board</button>
+                    <button id="menu-clear" class="dark menu-item">Clear Board</button>
                 </div>
             </div>
-        </div>
-        <div id="sidebar">
-            <a id="pencil" class="sidebtn tool" title="Draw"><img src="img/paintbrush.png" width="48" height="48"></img></a>
-            <a id="eraser" class="sidebtn tool" title="Erase"><img src="img/eraser.png" width="48" height="48" /></a>
-            <a id="drawrect" class="sidebtn tool" title="Draw Rectangle"><img src="img/rect.png" width="48" height="48" /></a>
-            <a id="fillrect" class="sidebtn tool" title="Fill Rectangle"><img src="img/fillrect.png" width="48" height="48" /></a>
-            <a id="clearrect" class="sidebtn tool" title="Clear Rectangle"><img src="img/clearrect.png" width="48" height="48" /></a>
-            <a id="drawcircle" class="sidebtn tool" title="Draw Circle"><img src="img/circle.png" width="48" height="48" /></a>
-            <a id="fillcircle" class="sidebtn tool" title="Fill Circle"><img src="img/fillcircle.png" width="48" height="48" /></a>
-            <a id="clearcircle" class="sidebtn tool" title="Clear Circle"><img src="img/clearcircle.png" width="48" height="48" /></a>
-            <input id="size" type="number" title="Size"></input>
-            <input class="color" id="color" value="000000" title="Color"></input>
-            <a id="save" class="sidebtn">Save Board</a>
-            <a id="setbg" class="sidebtn">Set Background</a>
-            <a id="clearbg" class="sidebtn">Clear Background</a>
-            <a id="clear" class="sidebtn sidebtn-bottom red">Clear Board</a>
-            <div id="users">0</div>
 
-            <input id="filepicker" type="file" accept="image/*" />
-        </div>
-        <!-- <div id="snapshots"></div> -->
-        <div id="chat">
-            <div id="chatMessageContainer"></div>
-            <input type="text" id="chatMessage" placeholder="tYPE HERE"></input>
-            <button id="sendMessage" class="btn" title="Send"><img src="img/message.png" width="32" height="32" /></button>
+
+            <div id="container-chat" class="primary">
+                <div id="container-chat-items" class="dark"></div>
+                <!--div id="container-chat-input"-->
+                    <input type="text" id="chat-input" placeholder="tYPE HERE" />
+                    <button id="chat-send">Send</button>
+                <!--/div-->
+            </div>
         </div>
     </body>
 </html>

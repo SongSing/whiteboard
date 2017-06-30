@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+
+        <title>Whiteboard</title>
+        
+        <script src="js/colors/jscolor.js"></script>
+        <script src="js/sockjs-1.1.1.min.js"></script>
+        <script src="js/canvas.js"></script>
+        <script src="js/tools.js"></script>
+        <script src="js/whiteboard.js"></script>
+        
+        <link rel="stylesheet" href="css/styles.css"></link>
+    </head>
+    <body>
+        <div id="landing">
+            <div id="landingHeader">online white board by me</div>
+            <div id="landingStrip">
+                <input id="server" title="http://(ip)/wb/(room)" value="http://68.53.99.168/wb/lobby" />
+                <button id="connect">Connect.</button>
+            </div>
+        </div>
+        <div id="canvasArea">
+            <canvas id="canvas"></canvas>
+            <canvas id="drawcanvas"></canvas>
+            <div id="over">
+                <div id="sizePicker" class="picker">
+                    <button id="sizeok" class="ok">OK</button>
+                </div>
+                <div id="colorPicker" class="picker">
+                    <button id="colorok" class="ok">OK</button>
+                </div>
+            </div>
+        </div>
+        <div id="sidebar">
+            <a id="pencil" class="sidebtn tool" title="Draw"><img src="img/paintbrush.png" width="48" height="48"></img></a>
+            <a id="eraser" class="sidebtn tool" title="Erase"><img src="img/eraser.png" width="48" height="48" /></a>
+            <a id="drawrect" class="sidebtn tool" title="Draw Rectangle"><img src="img/rect.png" width="48" height="48" /></a>
+            <a id="fillrect" class="sidebtn tool" title="Fill Rectangle"><img src="img/fillrect.png" width="48" height="48" /></a>
+            <a id="clearrect" class="sidebtn tool" title="Clear Rectangle"><img src="img/clearrect.png" width="48" height="48" /></a>
+            <a id="drawcircle" class="sidebtn tool" title="Draw Circle"><img src="img/circle.png" width="48" height="48" /></a>
+            <a id="fillcircle" class="sidebtn tool" title="Fill Circle"><img src="img/fillcircle.png" width="48" height="48" /></a>
+            <a id="clearcircle" class="sidebtn tool" title="Clear Circle"><img src="img/clearcircle.png" width="48" height="48" /></a>
+            <input id="size" type="number" title="Size"></input>
+            <input class="color" id="color" value="000000" title="Color"></input>
+            <a id="save" class="sidebtn">Save Board</a>
+            <a id="setbg" class="sidebtn">Set Background</a>
+            <a id="clearbg" class="sidebtn">Clear Background</a>
+            <a id="clear" class="sidebtn sidebtn-bottom red">Clear Board</a>
+            <div id="users">0</div>
+
+            <input id="filepicker" type="file" accept="image/*" />
+        </div>
+        <!-- <div id="snapshots"></div> -->
+        <div id="chat">
+            <div id="chatMessageContainer"></div>
+            <input type="text" id="chatMessage" placeholder="tYPE HERE"></input>
+            <button id="sendMessage" class="btn" title="Send"><img src="img/message.png" width="32" height="32" /></button>
+        </div>
+    </body>
+</html>

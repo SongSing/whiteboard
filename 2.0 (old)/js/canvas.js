@@ -4,92 +4,38 @@
 // by me //
 ///////////
 
+// https://github.com/google/canvas-5-polyfill/blob/master/canvasv5.js
+if (CanvasRenderingContext2D.prototype.ellipse == undefined) {
+    CanvasRenderingContext2D.prototype.ellipse = function(x, y, radiusX, radiusY, rotation, startAngle, endAngle, antiClockwise) {
+        this.save();
+        this.translate(x, y);
+        this.rotate(rotation);
+        this.scale(radiusX, radiusY);
+        this.arc(0, 0, 1, startAngle, endAngle, antiClockwise);
+        this.restore();
+    }
+}
+
 /**
  * Creates Canvas class from DOM CanvasElement
  * @class
  * @classdesc Easy-to-use canvas helper class
  * @param {object} canvas - DOM CanvasElement
- * @param {number=} flags - OR-combined Canvas.flags items
  */
-function Canvas(canvas, flags) {
+function Canvas(canvas) {
     this.canvas = canvas;
     this.translation = { x: 0, y: 0 };
-    flags = flags || 0;
 
-    this.mouseDownEvents = [];
-    this.mouseMoveEvents = [];
-    this.mouseUpEvents = [];
-    this.mouseLeaveEvents = [];
+    this.mouseMove = undefined;
+    this.mouseDown = undefined;
+    this.mouseUp = undefined;
+    this.mouseLeave = undefined;
+
     this.mouseIsDown = false;
-    this.usingDeepCalc = flags & Canvas.flags.useDeepCalc;
-    this.horizontalAligned = flags & Canvas.flags.halign;
-    this.verticalAligned = flags & Canvas.flags.valign;
-
     this.lastPos = undefined;
 
-    if (this.usingDeepCalc) {
-        this.deepCalcPosition();
-
-        window.addEventListener("resize", this.deepCalcPosition);
-    }
-
-    var self = this;
-
-    var mm = function(e) {
-        var p = self.pos(e);
-        if (self.lastPos === undefined) self.lastPos = p;
-
-        for (var i = 0; i < self.mouseMoveEvents.length; i++) {
-            if (self.mouseMoveEvents[i](p.x, p.y, self.mouseIsDown, self.lastPos.x, self.lastPos.y, e) !== false) {
-                self.lastPos = p;
-            }
-        }
-    };
-
-    var md = function(e) {
-        var p = self.pos(e);
-        self.mouseIsDown = true;
-        self.lastPos = p;
-
-        for (var i = 0; i < self.mouseDownEvents.length; i++) {
-            self.mouseDownEvents[i](p.x, p.y, e);
-        }
-    };
-
-    var mu = function(e) {
-        var p = self.pos(e);
-        self.mouseIsDown = false;
-
-        for (var i = 0; i < self.mouseUpEvents.length; i++) {
-            self.mouseUpEvents[i](p.x, p.y, e);
-        }
-
-        self.lastPos = p;
-    };
-
-    var ml = function(e) {
-        var p = self.pos(e);
-
-        for (var i = 0; i < self.mouseLeaveEvents.length; i++) {
-            self.mouseLeaveEvents[i](p.x, p.y, e);
-        }
-    };
-
-    this.canvas.addEventListener("mousemove", mm);
-    this.canvas.addEventListener("touchmove", mm);
-    this.canvas.addEventListener("mousedown", md);
-    this.canvas.addEventListener("touchstart", md);
-    this.canvas.addEventListener("mouseup", mu);
-    this.canvas.addEventListener("touchend", mu);
-    this.canvas.addEventListener("mouseleave", ml);
-    this.canvas.addEventListener("touchcancel", ml);
+    this.deepCalcPosition();
 }
-
-Canvas.flags = {
-    useDeepCalc: 1,
-    halign: 2,
-    valign: 4
-};
 
 Canvas.imageToDataURL = function(img, shrinkage) {
     shrinkage = shrinkage || 1;
@@ -143,36 +89,94 @@ Canvas.prototype.deepCalcPosition = function() {
  * Sets function to use when mouse is moved on canvas (or touch moved)
  * @param {Function} fn - function to be called on mousemove (or touchmove)
  */
-Canvas.prototype.hookMouseMove =
 Canvas.prototype.setMouseMove = function(fn) {
-    this.mouseMoveEvents.push(fn);
+    this.mouseMove = fn;
+    var self = this;
+
+    this.canvas.addEventListener("mousemove", function(e) {
+        var p = self.pos(e);
+        if (self.lastPos === undefined) self.lastPos = p;
+            if (self.mouseMove(p.x, p.y, self.mouseIsDown, self.lastPos.x, self.lastPos.y, e) !== false) {
+            self.lastPos = p;
+        }
+    });
+
+    this.canvas.addEventListener("touchmove", function(e) {
+        var p = self.pos(e);
+        if (self.lastPos === undefined) self.lastPos = p;
+            if (self.mouseMove(p.x, p.y, self.mouseIsDown, self.lastPos.x, self.lastPos.y, e) !== false) {
+            self.lastPos = p;
+        }
+    });
 };
 
 /**
  * Sets function to use on mousedown (or touch start)
  * @param {Function} fn function to be called on mousedown/touchstart
  */
-Canvas.prototype.hookMouseDown =
 Canvas.prototype.setMouseDown = function(fn) {
-    this.mouseDownEvents.push(fn);
+    var self = this;
+    self.mouseDown = fn;
+    //console.log("main:");
+    //console.log(self);
+
+    this.canvas.addEventListener("mousedown", function(e) {
+        var p = self.pos(e);
+        self.mouseIsDown = true;
+        self.lastPos = p;
+        self.mouseDown(p.x, p.y, e);
+        //console.log("listener:");
+        //console.log(self);
+    });
+
+    this.canvas.addEventListener("touchstart", function(e) {
+        var p = self.pos(e);
+        self.mouseIsDown = true;
+        self.lastPos = p;
+        self.mouseDown(p.x, p.y, e);
+    });
 };
 
 /**
  * Sets function to use on mouseup (or touch release)
  * @param {Function} fn function to be called on mouseup/touchrelease
  */
-Canvas.prototype.hookMouseUp =
 Canvas.prototype.setMouseUp = function(fn) {
-    this.mouseUpEvents.push(fn);
+    this.mouseUp = fn;
+    var self = this;
+
+    this.canvas.addEventListener("mouseup", function(e) {
+        var p = self.pos(e);
+        self.mouseIsDown = false;
+        self.mouseUp(p.x, p.y, self.lastPos.x, self.lastPos.y, e);
+        self.lastPos = p;
+    });
+
+    this.canvas.addEventListener("touchend", function(e) {
+        var p = self.pos(e);
+        self.mouseIsDown = false;
+        self.mouseUp(p.x, p.y, self.lastPos.x, self.lastPos.y, e);
+        self.lastPos = p;
+    });
 };
 
 /**
  * Sets function to use on mouseleave (or touchcancel)
  * @param {Function} fn function to be called on mouseleave/touchcancel
  */
-Canvas.prototype.hookMouseLeave =
 Canvas.prototype.setMouseLeave = function(fn) {
-    this.mouseLeaveEvents.push(fn);
+    this.mouseLeave = fn;
+    var self = this;
+
+    this.canvas.addEventListener("mouseleave", function(e) {
+        var p = self.pos(e);
+        self.mouseLeave(e);
+    });
+
+    this.canvas.addEventListener("touchcancel", function(e) {
+        var p = self.pos(e);
+        self.mouseLeave(e);
+    });
 };
 
 /**
@@ -189,20 +193,8 @@ Canvas.prototype.pos = function(e) {
         y = e.changedTouches[0].pageY;
     }
 
-    var ox = this.usingDeepCalc ? this.offset.x : this.canvas.offsetLeft;
-    var oy = this.usingDeepCalc ? this.offset.y : this.canvas.offsetTop;
-
-    if (this.horizontalAligned && ox > 0) {
-        ox = (2 * ox - this.canvas.offsetWidth) / 2;
-    }
-
-    if (this.verticalAligned && oy > 0) {
-        oy = (2 * oy - this.canvas.offsetHeight) / 2;
-    }
-
-    x -= ox;
-    y -= oy;
-
+    x -= this.offset.x;
+    y -= this.offset.y;
 
     x *= this.canvas.width / this.canvas.offsetWidth;
     y *= this.canvas.height / this.canvas.offsetHeight;
@@ -221,15 +213,6 @@ Canvas.prototype.context = function(type) {
     }
 
     return this.canvas.getContext(type);
-};
-
-/**
- * Gets data url from canvas data (can be used to view in-browser as image)
- * @return {string} dataurl
- */
-Canvas.prototype.getDataURL =
-Canvas.prototype.toDataURL = function() {
-    return this.canvas.toDataURL();
 };
 
 /**
@@ -272,8 +255,6 @@ Canvas.prototype.resize = function(w, h, redraw) {
     if (redraw) {
         this.drawDataURL(data);
     }
-
-    this.deepCalcPosition();
 };
 
 /**
@@ -370,14 +351,6 @@ Canvas.prototype.setLineJoin = function(join) {
 
 Canvas.prototype.lineJoin = function() {
     return this.context().lineJoin;
-};
-
-Canvas.prototype.setLineDash = function(dash) {
-    this.context().setLineDash(dash);
-};
-
-Canvas.prototype.lineDash = function() {
-    return this.context().getLineDash();
 };
 
 Canvas.prototype.setFont = function(font) {
@@ -520,6 +493,26 @@ Canvas.prototype.fillRect = function(x, y, w, h, color) {
     }
 
     this.context().fillRect(x, y, w, h);
+};
+
+Canvas.prototype.fillRectPts = function(x1, y1, x2, y2, color) {
+    if (color !== undefined) {
+        this.context().fillStyle = color;
+    }
+
+    if (x1 > x2) {
+        var _ = x1;
+        x1 = x2;
+        x2 = _;
+    }
+
+    if (y1 > y2) {
+        var _ = y1;
+        y1 = y2;
+        y2 = _;
+    }
+
+    this.context().fillRect(x1, y1, x2 - x1, y2 - y1);
 };
 
 /**
@@ -758,12 +751,41 @@ Canvas.prototype.drawCircleInPts = function(x1, y1, x2, y2, color, lineWidth) {
     ctx.stroke();
 };
 
+
+
+Canvas.prototype.fillCircleInPts = function(x1, y1, x2, y2, color) {
+    var ctx = this.context();
+
+    if (color !== undefined) {
+        ctx.fillStyle = color;
+    }
+
+    if (x1 > x2) {
+        var _ = x1;
+        x1 = x2;
+        x2 = _;
+    }
+
+    if (y1 > y2) {
+        var _ = y1;
+        y1 = y2;
+        y2 = _;
+    }
+
+    var w = x2 - x1;
+    var h = y2 - y1;
+
+    ctx.beginPath();
+    ctx.ellipse(x1 + w / 2, y1 + h / 2, w / 2, h / 2, 0, 0, 2 * Math.PI, false);
+    ctx.fill();
+};
+
 /**
  * Draws an image
  * @param  {Image} image    image to draw
  * @param  {number} x       x position
  * @param  {number} y       y position
- * @param  {number=} w       width - if undefined, will use the image's width
+ * @param  {number} w       width - if undefined, will use the image's width
  * @param  {number=} h      height - if undefined, will use the image's height
  * @return {undefined}      no return value
  */
@@ -850,6 +872,15 @@ Canvas.prototype.drawRotatedCroppedImage = function(image, rotate, x, y, cx, cy,
 };
 
 /**
+ * Gets data url from canvas data (can be used to view in-browser as image)
+ * @return {string} dataurl
+ */
+Canvas.prototype.getDataURL =
+Canvas.prototype.toDataURL = function() {
+    return this.canvas.toDataURL();
+};
+
+/**
  * Draws data URL to canvas
  * @param  {string}     data        data URL
  * @param  {number}     x           x position
@@ -873,7 +904,6 @@ Canvas.prototype.drawDataURL = function(data, x, y, w, h, callback) {
 
     img.onerror = function(e) {
         console.log(e);
-        console.log(data);
     };
 
     img.src = data;
@@ -910,20 +940,13 @@ Canvas.prototype.putImageData = function(data, x, y) {
     this.context().putImageData(data, x, y);
 };
 
-Canvas.prototype.getImageData32 = function(x, y, w, h) {
-    var imageData = this.getImageData(x, y, w, h);
-    var data = new Uint32Array(imageData.data.buffer);
-
-    return data;
-};
-
 /**
  * Generates an image from canvas and returns it through a callback function
  * @param  {Function} cb    Callback function taking an Image argument to be used as a returner
  * @return {undefined}      no value - Image is returned through callback function
  */
-Canvas.prototype.extractImage =
-Canvas.prototype.getImage = function(cb) {
+Canvas.prototype.getImage =
+Canvas.prototype.toImage = function(cb) {
     var ret = new Image();
     ret.onload = function() {
         cb(this);
@@ -938,7 +961,6 @@ Canvas.prototype.getImage = function(cb) {
  * @return {number}   x-value of object to be used to center it
  */
 Canvas.prototype.cx = function(w) {
-    w = w || 0;
     return this.canvas.width / 2 - w / 2;
 };
 
@@ -948,6 +970,5 @@ Canvas.prototype.cx = function(w) {
  * @return {number}   y-value of object to be used to center it
  */
 Canvas.prototype.cy = function(h) {
-    h = h || 0;
     return this.canvas.height / 2 - h / 2;
 };
