@@ -14,6 +14,7 @@ var mouseIsDown = false;
 var workingImg;
 var borderTimer;
 var borderSwitch = false;
+var baseUrl;
 
 var handlers = {
     connect: function(data) {
@@ -42,6 +43,13 @@ var handlers = {
         setInterval(function() {
             sendBoard();
         }, 10000);
+
+        if (window.history.replaceState) {
+            var p = new URLSearchParams("");
+            p.append("server", document.getElementById("server").value);
+            p.append("room", document.getElementById("server-room").value);
+            window.history.replaceState({}, null, baseUrl + "?" + p.toString());
+        }
     },
     draw: function(data) {
         canvas_main.drawLine(data.x1, data.y1, data.x2, data.y2, data.color, data.size);
@@ -83,6 +91,7 @@ function applyToCanvas(fn) {
 };
 
 function init() {
+    baseUrl = window.location.href.substr(0, window.location.href.indexOf("?"));
     goto_landing();
     document.getElementById("connect").addEventListener("click", connectToServer);
     canvas_bottom = new Canvas(document.getElementById("canvas-bottom"), Canvas.flags.useDeepCalc);
@@ -107,23 +116,27 @@ function init() {
     }
 
     canvas_fx.setMouseMove(function(x, y, md, lx, ly, e) {
-        e.preventDefault();
-        currentTool.clearCursor(x, y, lx, ly, e);
-        currentTool.mouseMove(x, y, lx, ly, e);
-        currentTool.drawCursor(x, y, lx, ly, e);
+        if (receivedBoard) {
+            e.preventDefault();
+            currentTool.clearCursor(x, y, lx, ly, e);
+            currentTool.mouseMove(x, y, lx, ly, e);
+            currentTool.drawCursor(x, y, lx, ly, e);
+        }
     });
 
     canvas_fx.setMouseDown(function(x, y, e) {
-        e.preventDefault();
-        if (e.button === 0 || e.changedTouches) {
-            mouseIsDown = true;
-        }
+        if (receivedBoard) {
+            e.preventDefault();
+            if (e.button === 0 || e.changedTouches) {
+                mouseIsDown = true;
+            }
 
-        //canvas_fx.clear();
-        currentTool.mouseDown(x, y, e);
-        toggleTools(false);
-        toggleSize(false);
-        toggleMenu(false);
+            //canvas_fx.clear();
+            currentTool.mouseDown(x, y, e);
+            toggleTools(false);
+            toggleSize(false);
+            toggleMenu(false);
+        }
     });
 
     /*canvas_fx.setMouseUp(function(x, y, e) {
@@ -132,22 +145,22 @@ function init() {
     });*/
 
     var mu = function(e) {
-        //e.preventDefault();
-        if (!receivedBoard) return;
-        e.pageX += canvas_fx.canvas.offsetLeft;
-        e.pageY += canvas_fx.canvas.offsetTop;
+        if (receivedBoard) {
+            e.pageX += canvas_fx.canvas.offsetLeft;
+            e.pageY += canvas_fx.canvas.offsetTop;
 
-        if (e.changedTouches) {
-            e.changedTouches[0].pageX += canvas_fx.canvas.offsetLeft;
-            e.changedTouches[0].pageY += canvas_fx.canvas.offsetTop;
-            canvas_fx.clear();
+            if (e.changedTouches) {
+                e.changedTouches[0].pageX += canvas_fx.canvas.offsetLeft;
+                e.changedTouches[0].pageY += canvas_fx.canvas.offsetTop;
+                canvas_fx.clear();
+            }
+
+            var p = canvas_fx.pos(e);
+            mouseIsDown = false;
+            if (canvas_fx.lastPos === undefined) canvas_fx.lastPos = p;
+            currentTool.mouseUp(p.x, p.y, canvas_fx.lastPos.x, canvas_fx.lastPos.y, e);
+            canvas_fx.lastPos = p;
         }
-
-        var p = canvas_fx.pos(e);
-        mouseIsDown = false;
-        if (canvas_fx.lastPos === undefined) canvas_fx.lastPos = p;
-        currentTool.mouseUp(p.x, p.y, canvas_fx.lastPos.x, canvas_fx.lastPos.y, e);
-        canvas_fx.lastPos = p;
     };
 
     document.body.addEventListener("mouseup", mu);
@@ -312,6 +325,14 @@ function init() {
 
     window.addEventListener("resize", resized);
     resized();
+
+    var url = window.location;
+    var params = new URLSearchParams(url.search);
+    if (params.has("server") && params.has("room")) {
+        document.getElementById("server").value = params.get("server");
+        document.getElementById("server-room").value = params.get("room");
+        connectToServer();
+    }
 }
 
 function toggleTools(z) {
