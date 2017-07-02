@@ -222,7 +222,12 @@ function init() {
         if (!this.files[0]) return;
         var file = this.files[0];
 
-        Canvas.fileToImage(file, putImage);
+        Canvas.fileToImage(file, function(img) {
+            var c = new Canvas(document.createElement("canvas"));
+            c.resize(img.width, img.height, false);
+            c.drawImage(img, 0, 0);
+            c.toImage(putImage);
+        });
     });
     document.getElementById("tool-confirm").addEventListener("click", function() {
         document.getElementById("tool-confirm").style.display = "none";
@@ -267,6 +272,7 @@ function init() {
 }
 
 function putImage(img) {
+    console.log(img.src);
 
     //document.getElementById("tool-img-label").style.opacity = "0";
     document.getElementById("tool-confirm").style.display = "inline-block";
@@ -280,12 +286,17 @@ function putImage(img) {
 
     var src = img.src;
     workingImg = img;
-    var w = img.width;
-    var h = img.height;
+    var w = img.width || 1;
+    var h = img.height || 1;
 
     while (w > canvas_main.canvas.offsetWidth || h > canvas_main.canvas.offsetHeight) {
         w /= 2;
         h /= 2;
+    }
+
+    while (w < 40 || h < 40) {
+        w *= 2;
+        h *= 2;
     }
 
     var $d = document.createElement("div");
@@ -295,7 +306,7 @@ function putImage(img) {
     $d.style.resize = "both";
     $d.style.position = "absolute";
     $d.style.left = "0px";
-    $d.style.top = "0px";
+    $d.style.top = "64px";
     $d.style.width = w + "px";
     $d.style.height = h + "px";
     $d.style["z-index"] = "1500";
@@ -309,7 +320,7 @@ function putImage(img) {
         }
         var _x = e.pageX - r.left;
         var _y = e.pageY - r.top;
-        if (this.offsetWidth - _x < 20 && this.offsetHeight - _y < 20) {
+        if (Math.abs(this.offsetWidth - _x) < 20 && Math.abs(this.offsetHeight - _y) < 20) {
             return;
         }
 
@@ -347,6 +358,8 @@ function putImage(img) {
     $d.addEventListener("touchmove", mm);
     $d.addEventListener("mouseup", mu);
     $d.addEventListener("touchend", mu);
+    $d.addEventListener("mouseleave", mu);
+    $d.addEventListener("touchcancel", mu);
 
     document.getElementById("container-over").appendChild($d);
     document.getElementById("input-img").value = null;

@@ -923,6 +923,7 @@ Canvas.prototype.getImageData32 = function(x, y, w, h) {
  * @return {undefined}      no value - Image is returned through callback function
  */
 Canvas.prototype.extractImage =
+Canvas.prototype.toImage =
 Canvas.prototype.getImage = function(cb) {
     var ret = new Image();
     ret.onload = function() {
