@@ -22,6 +22,7 @@ var handlers = {
         document.getElementById("container-landing").style.display = "none";
     },
     disconnect: function(data) {
+        console.log(data);
         goto_landing();
     },
     welcome: function(data) {
@@ -136,6 +137,7 @@ function init() {
             toggleTools(false);
             toggleSize(false);
             toggleMenu(false);
+            toggleImgMenu(false);
         }
     });
 
@@ -173,6 +175,7 @@ function init() {
     document.getElementById("tool-tool").addEventListener("click", toggleTools);
     document.getElementById("tool-size").addEventListener("click", toggleSize);
     document.getElementById("tool-menu").addEventListener("click", toggleMenu);
+    document.getElementById("tool-img").addEventListener("click", toggleImgMenu);
     document.getElementById("chat-send").addEventListener("click", sendMessage);
     document.getElementById("menu-save").addEventListener("click", function() {
         var c = new Canvas(document.createElement("canvas"));
@@ -203,95 +206,25 @@ function init() {
     document.getElementById("input-size").addEventListener("change", function() {
         canvas_fx.clear();
     });
-    document.getElementById("tool-img").addEventListener("change", function() {
-        if (!this.files[0]) return;
-        //document.getElementById("tool-img-label").style.opacity = "0";
-        document.getElementById("tool-confirm").style.display = "inline-block";
-        toggleOver(true);
-        var $hint = document.getElementById("container-boardhint");
-        borderTimer = setInterval(function() {
-            $hint.style["border-color"] = borderSwitch ? "black" : "white";
-            borderSwitch = !borderSwitch;
-        }, 1000);
+    document.getElementById("img-menu-url").addEventListener("click", function() {
+        var url = prompt("Enter image URL:", "http://i.imgur.com/6MkRDge.png");
+        if (url) {
+            var img = new Image();
 
+            img.addEventListener("load", function() {
+                putImage(this);
+            });
+
+            img.src = url;
+        }
+    });
+    document.getElementById("input-img").addEventListener("change", function() {
+        if (!this.files[0]) return;
         var file = this.files[0];
 
-        Canvas.fileToImage(file, (function(img) {
-            var src = img.src;
-            workingImg = img;
-            var w = img.width;
-            var h = img.height;
-
-            while (w > canvas_main.canvas.offsetWidth || h > canvas_main.canvas.offsetHeight) {
-                w /= 2;
-                h /= 2;
-            }
-
-            var $d = document.createElement("div");
-            $d.className = "img";
-            $d.style["background-image"] = "url('" + src + "')";
-            $d.style["background-size"] = "100% 100%";
-            $d.style.resize = "both";
-            $d.style.position = "absolute";
-            $d.style.left = "0px";
-            $d.style.top = "0px";
-            $d.style.width = w + "px";
-            $d.style.height = h + "px";
-            $d.style["z-index"] = "1500";
-            $d.style.overflow = "auto";
-
-            var md = function(e) {
-                var r = this.getBoundingClientRect();
-                if (e.changedTouches) {
-                    e.pageX = e.changedTouches[0].pageX;
-                    e.pageY = e.changedTouches[0].pageY;
-                }
-                var _x = e.pageX - r.left;
-                var _y = e.pageY - r.top;
-                if (this.offsetWidth - _x < 20 && this.offsetHeight - _y < 20) {
-                    return;
-                }
-
-                this.ox = e.pageX;
-                this.oy = e.pageY;
-                this.sx = getComputedStyle(this).left;
-                this.sy = getComputedStyle(this).top;
-                this.sx = parseInt(this.sx.substr(0, this.sx.length - 2));
-                this.sy = parseInt(this.sy.substr(0, this.sy.length - 2));
-                this.down = true;
-            };
-
-            var mm = function(e) {
-                e.preventDefault();
-                if (this.down) {
-                    if (e.changedTouches) {
-                        e.pageX = e.changedTouches[0].pageX;
-                        e.pageY = e.changedTouches[0].pageY;
-                    }
-                    var dx = e.pageX - this.ox;
-                    var dy = e.pageY - this.oy;
-                    this.style.left = this.sx + dx + "px";
-                    this.style.top = this.sy + dy + "px";
-                }
-            };
-
-            var mu = function(e) {
-                this.down = false;
-            };
-
-            $d.addEventListener("mousedown", md);
-            $d.addEventListener("touchstart", md);
-            $d.addEventListener("mousemove", mm);
-            $d.addEventListener("touchmove", mm);
-            $d.addEventListener("mouseup", mu);
-            $d.addEventListener("touchend", mu);
-
-            document.getElementById("container-over").appendChild($d);
-            this.value = null;
-        }).bind(this));
+        Canvas.fileToImage(file, putImage);
     });
     document.getElementById("tool-confirm").addEventListener("click", function() {
-        document.getElementById("tool-img-label").style.opacity = "1";
         document.getElementById("tool-confirm").style.display = "none";
         clearInterval(borderTimer);
         var $i = document.getElementsByClassName("img")[0];
@@ -303,11 +236,8 @@ function init() {
         var x = r.left * scale;
         var y = (r.top - 64) * scale;
 
-        var c = new Canvas(document.createElement("canvas"));
-        c.resize(w, h, false);
-        c.drawImage(workingImg, 0, 0, w, h);
         socket.emit("img", {
-            data: c.toDataURL(),
+            data: workingImg.src,
             x: x,
             y: y,
             width: w,
@@ -322,6 +252,7 @@ function init() {
     toggleTools(false);
     toggleSize(false);
     toggleMenu(false);
+    toggleImgMenu(false);
 
     window.addEventListener("resize", resized);
     resized();
@@ -335,6 +266,92 @@ function init() {
     }
 }
 
+function putImage(img) {
+
+    //document.getElementById("tool-img-label").style.opacity = "0";
+    document.getElementById("tool-confirm").style.display = "inline-block";
+    toggleOver(true);
+    var $hint = document.getElementById("container-boardhint");
+    borderTimer = setInterval(function() {
+        $hint.style["border-color"] = borderSwitch ? "black" : "white";
+        borderSwitch = !borderSwitch;
+    }, 1000);
+
+
+    var src = img.src;
+    workingImg = img;
+    var w = img.width;
+    var h = img.height;
+
+    while (w > canvas_main.canvas.offsetWidth || h > canvas_main.canvas.offsetHeight) {
+        w /= 2;
+        h /= 2;
+    }
+
+    var $d = document.createElement("div");
+    $d.className = "img";
+    $d.style["background-image"] = "url('" + src + "')";
+    $d.style["background-size"] = "100% 100%";
+    $d.style.resize = "both";
+    $d.style.position = "absolute";
+    $d.style.left = "0px";
+    $d.style.top = "0px";
+    $d.style.width = w + "px";
+    $d.style.height = h + "px";
+    $d.style["z-index"] = "1500";
+    $d.style.overflow = "auto";
+
+    var md = function(e) {
+        var r = this.getBoundingClientRect();
+        if (e.changedTouches) {
+            e.pageX = e.changedTouches[0].pageX;
+            e.pageY = e.changedTouches[0].pageY;
+        }
+        var _x = e.pageX - r.left;
+        var _y = e.pageY - r.top;
+        if (this.offsetWidth - _x < 20 && this.offsetHeight - _y < 20) {
+            return;
+        }
+
+        this.ox = e.pageX;
+        this.oy = e.pageY;
+        this.sx = getComputedStyle(this).left;
+        this.sy = getComputedStyle(this).top;
+        this.sx = parseInt(this.sx.substr(0, this.sx.length - 2));
+        this.sy = parseInt(this.sy.substr(0, this.sy.length - 2));
+        this.down = true;
+    };
+
+    var mm = function(e) {
+        if (this.down) {
+            if (e.changedTouches) {
+                e.pageX = e.changedTouches[0].pageX;
+                e.pageY = e.changedTouches[0].pageY;
+
+            }
+            var dx = e.pageX - this.ox;
+            var dy = e.pageY - this.oy;
+            this.style.left = this.sx + dx + "px";
+            this.style.top = this.sy + dy + "px";
+            e.preventDefault();
+        }
+    };
+
+    var mu = function(e) {
+        this.down = false;
+    };
+
+    $d.addEventListener("mousedown", md);
+    $d.addEventListener("touchstart", md);
+    $d.addEventListener("mousemove", mm);
+    $d.addEventListener("touchmove", mm);
+    $d.addEventListener("mouseup", mu);
+    $d.addEventListener("touchend", mu);
+
+    document.getElementById("container-over").appendChild($d);
+    document.getElementById("input-img").value = null;
+}
+
 function toggleTools(z) {
     var $t = document.getElementById("container-tools");
     var visible = getComputedStyle($t).display !== "none";
@@ -345,6 +362,7 @@ function toggleTools(z) {
         $t.style.display = "inline-block";
         toggleSize(false);
         toggleMenu(false);
+        toggleImgMenu(false);
     }
 }
 
@@ -358,6 +376,7 @@ function toggleSize(z) {
         $t.style.display = "inline-block";
         toggleTools(false);
         toggleMenu(false);
+        toggleImgMenu(false);
     }
 }
 
@@ -371,6 +390,21 @@ function toggleMenu(z) {
         $t.style.display = "inline-block";
         toggleTools(false);
         toggleSize(false);
+        toggleImgMenu(false);
+    }
+}
+
+function toggleImgMenu(z) {
+    var $t = document.getElementById("container-img-menu");
+    var visible = getComputedStyle($t).display !== "none";
+    if (z === true || z === false) visible = !z;
+    if (visible) {
+        $t.style.display = "none";
+    } else {
+        $t.style.display = "inline-block";
+        toggleTools(false);
+        toggleSize(false);
+        toggleMenu(false);
     }
 }
 
@@ -384,6 +418,8 @@ function toggleOver(z) {
         $t.style.display = "inline-block";
         toggleTools(false);
         toggleSize(false);
+        toggleMenu(false);
+        toggleImgMenu(false);
     }
 }
 

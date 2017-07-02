@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>Whiteboard</title>
         <link rel="stylesheet" href="css/style.css"></link>
         <!--<script src="js/jquery-2.1.4.min.js"></script>-->
         <script src="js/socket.io.slim.js"></script>
@@ -43,8 +44,8 @@
                     <div id="container-misc">
                         <div id="tool-tool" class="misc" title="Tools"></div>
                         <div id="tool-size" class="misc" title="Size"></div>
-                        <input id="tool-img" type="file" />
-                        <label for="tool-img" class="misc" title="Image" id="tool-img-label"></label>
+                        <input id="input-img" type="file" />
+                        <div id="tool-img" class="misc" title="Image" id="tool-img-label"></div>
                         <div id="tool-menu" class="misc" title="Menu"></div>
                     </div>
                 </div>
@@ -62,6 +63,10 @@
                 <div id="container-menu" class="dark">
                     <button id="menu-save" class="dark menu-item">Save Board</button>
                     <button id="menu-clear" class="dark menu-item">Clear Board</button>
+                </div>
+                <div id="container-img-menu" class="dark">
+                    <label for="input-img" id="img-menu-upload" class="dark menu-item">Choose file...</label>
+                    <button id="img-menu-url" class="dark menu-item">From URL (takes a sec)</button>
                 </div>
             </div>
 

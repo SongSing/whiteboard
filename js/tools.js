@@ -39,8 +39,8 @@ function initTools() {
         src: "img/eraser.png",
         count: 0,
         drawCursor: function(x, y, lx, ly, e) {
-            canvas_fx.drawCircle(x, y, settings.size / 2, "black", 2);
-            canvas_fx.drawCircle(x, y, settings.size / 2, "white", 1);
+            canvas_fx.fillCircle(x, y, settings.size / 2, "rgba(255,255,255,0.5)");
+            canvas_fx.drawCircle(x, y, settings.size / 2, "black", 1);
         },
         clearCursor: function(x, y, lx, ly, e) {
             this.count++;
