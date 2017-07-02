@@ -183,8 +183,8 @@ function init() {
         c.fill("white");
         c.drawImage(canvas_bottom.canvas, 0, 0, resX, resY);
         c.drawImage(canvas_main.canvas, 0, 0, resX, resY);
-        window.open(c.toDataURL(), "_blank");
-        toggleMenu(false);
+        this.href = c.toDataURL();
+        this.download = settings.room + ".png";
     });
     document.getElementById("menu-clear").addEventListener("click", function() {
         socket.emit("clear");
@@ -272,8 +272,6 @@ function init() {
 }
 
 function putImage(img) {
-    console.log(img.src);
-
     //document.getElementById("tool-img-label").style.opacity = "0";
     document.getElementById("tool-confirm").style.display = "inline-block";
     toggleOver(true);
